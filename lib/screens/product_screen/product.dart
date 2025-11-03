@@ -147,7 +147,6 @@ class Product extends StatelessWidget {
 
                     const SizedBox(height: 25),
 
-                    // Description
                     const Text(
                       'Description',
                       style: TextStyle(

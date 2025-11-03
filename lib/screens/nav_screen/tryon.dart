@@ -54,13 +54,67 @@ class _TryonState extends State<Tryon> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                isShirt ? "Select Shirt" : "Select Pant",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
-                ),
+              Row(
+                children: [
+                  SizedBox(width: 20),
+                  Text(
+                    isShirt ? "Select Shirt" : "Select Pant",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inter',
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  Expanded(
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        suffixIcon: GestureDetector(
+                          onTap: () {},
+                          child: Icon(Icons.search, color: Colors.grey),
+                        ),
+                        hintText: 'Search',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+
+                        // 🟢 Default border
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                        ),
+
+                        // 🟡 When the field is not focused
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.5,
+                          ),
+                        ),
+
+                        // 🔵 When the user taps and focuses
+                        focusedBorder: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                          borderSide: BorderSide(
+                            color: Color(0xFFC19375),
+                            width: 2,
+                          ),
+                        ),
+
+                        // 🔴 Optional — remove blue focus glow (Android)
+                        focusColor: Colors.transparent,
+                        filled: true,
+                        fillColor: const Color(0xFFF7F7F7),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Flexible(
@@ -212,7 +266,7 @@ class _TryonState extends State<Tryon> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              "Add Shirt (${selectedShirtName})",
+                              "Add Shirt ($selectedShirtName)",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'Inter',
@@ -258,7 +312,7 @@ class _TryonState extends State<Tryon> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              "Add Pant (${selectedPantName})",
+                              "Add Pant ($selectedPantName)",
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'Inter',

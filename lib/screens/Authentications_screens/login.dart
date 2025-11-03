@@ -1,10 +1,38 @@
-import 'package:comercial_app/screens/login_signup_screens/signup.dart';
+import 'package:comercial_app/screens/Authentications_screens/signup.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
   const Login({super.key});
+
+  @override
+  State<Login> createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  Future<void> login() async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Nav()),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? "Signup Faild")));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +85,7 @@ class Login extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
                       enabledBorder: OutlineInputBorder(
@@ -75,6 +104,7 @@ class Login extends StatelessWidget {
                 SizedBox(
                   height: 40,
                   child: TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
@@ -100,12 +130,7 @@ class Login extends StatelessWidget {
                       foregroundColor: Colors.white,
                       backgroundColor: const Color(0xFFC19375),
                     ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Nav()),
-                      );
-                    },
+                    onPressed: login,
                     child: const Text('Log In'),
                   ),
                 ),
@@ -166,11 +191,7 @@ class Login extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/Google_Favicon_2025.svg',
-                          height: 20,
-                          width: 20,
-                        ),
+                        Icon(Icons.gamepad),
                         const SizedBox(width: 8),
                         const Text('Continue with Google'),
                       ],
@@ -193,11 +214,7 @@ class Login extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset(
-                          'assets/icons/Apple_logo_black.svg',
-                          height: 20,
-                          width: 20,
-                        ),
+                        Icon(Icons.apple),
                         const SizedBox(width: 8),
                         const Text('Continue with Apple'),
                       ],
@@ -218,7 +235,7 @@ class Login extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => Signup()),
                         );

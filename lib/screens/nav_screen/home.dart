@@ -3,6 +3,14 @@ import 'package:comercial_app/screens/product_screen/product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+final List<String> categories = [
+  'assets/images/full-length-portrait-businessman-isolated-gray-wall.jpg',
+  'assets/images/high-fashion-look-glamor-stylish-sexy-beautiful-young-woman-model-summer-black-hipster-dress.jpg',
+  'assets/images/full-shot-modern-boy-posing-with-sunglasses.jpg',
+  'assets/images/little-fashionista-with-shopping-bag-summer-hat-glasses-colored-pink-background-mom-s-shoes-concept-children-s-fashion.jpg',
+];
 
 final List<Map<String, String>> products = [
   {
@@ -30,7 +38,8 @@ final List<Map<String, String>> products = [
     "image": "assets/images/green_sale.png",
   },
 ];
-final List<Map<String, String>> banners = [
+
+final List<Map<String, dynamic>> banners = [
   {
     "Text1": "Womens Day",
     "Text2": "Up to 50% off",
@@ -42,6 +51,7 @@ final List<Map<String, String>> banners = [
     "Text2": "Up to 80% off",
     "image":
         "assets/images/carousel_banner/handsome-smiling-adult-man-casual-outfit-smiling-looking-left-promo-offer-standing-against-min.jpg",
+    "alignment": Alignment(0, -0.5),
   },
   {
     "Text1": "Kids Day",
@@ -50,6 +60,7 @@ final List<Map<String, String>> banners = [
         "assets/images/carousel_banner/young-smiley-girl-portrait-pointing (1).jpg",
   },
 ];
+
 int activeIndex = 0;
 final CarouselSliderController controller = CarouselSliderController();
 
@@ -65,361 +76,305 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 7),
-            Container(
-              height: 40,
-              decoration: BoxDecoration(
-                color: Color(0xFFF1F3F4),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  suffixIcon: Transform.scale(
-                    scale: 0.5,
-                    child: SvgPicture.asset(
-                      height: 1,
-                      width: 1,
-                      'assets/icons/filter_list_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 7.h),
+
+              // 🔍 Search Bar
+              Container(
+                height: 45.h,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F3F4),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    suffixIcon: Transform.scale(
+                      scale: 0.5,
+                      child: SvgPicture.asset(
+                        'assets/icons/filter_list_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
+                      ),
+                    ),
+                    prefixIcon: const Icon(Icons.search),
+                    contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+                    border: InputBorder.none,
+                    hintText: 'Search',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12.r)),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFC19375),
+                        width: 2,
+                      ),
                     ),
                   ),
-                  prefixIcon: Icon(Icons.search),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
-                  border: InputBorder.none,
-                  hintText: 'Search',
                 ),
               ),
-            ),
-            SizedBox(height: 7),
-            Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: CarouselSlider.builder(
-                    carouselController: controller,
-                    itemCount: banners.length,
-                    options: CarouselOptions(
-                      autoPlayCurve: Curves.slowMiddle,
-                      enableInfiniteScroll: true,
-                      pauseAutoPlayOnTouch: true,
-                      height: 120,
-                      autoPlay: true,
 
-                      enlargeCenterPage: false,
-                      viewportFraction: 1.0,
+              SizedBox(height: 10.h),
 
-                      onPageChanged: (index, reason) => setState(() {
-                        activeIndex = index;
-                      }),
-                    ),
-                    itemBuilder: (context, index, _) {
-                      final banner = banners[index];
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 27, 176, 202),
-                          image: DecorationImage(
-                            alignment: Alignment(0, -0.5),
-                            image: AssetImage(banner["image"]!),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(0.1),
-                              BlendMode.darken,
+              // 🖼️ Banner Carousel
+              Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(25.r),
+                    child: CarouselSlider.builder(
+                      carouselController: controller,
+                      itemCount: banners.length,
+                      options: CarouselOptions(
+                        height: 150.h,
+                        autoPlay: true,
+                        viewportFraction: 0.99,
+                        autoPlayCurve: Curves.fastEaseInToSlowEaseOut,
+                        onPageChanged: (index, reason) =>
+                            setState(() => activeIndex = index),
+                      ),
+                      itemBuilder: (context, index, _) {
+                        final banner = banners[index];
+
+                        return Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 6, 109, 144),
+                            image: DecorationImage(
+                              alignment:
+                                  banner["alignment"] ?? Alignment(0, -0.3),
+                              image: AssetImage(banner["image"]!),
+                              fit: BoxFit.cover,
+                              colorFilter: ColorFilter.mode(
+                                Colors.black.withOpacity(0.2),
+                                BlendMode.darken,
+                              ),
                             ),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 10),
+                            padding: EdgeInsets.all(16.w),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(height: 10),
+                                SizedBox(height: 10.h),
                                 Text(
                                   banner["Text1"]!,
                                   style: TextStyle(
                                     fontFamily: 'Jomolhari',
                                     color: Colors.white,
-                                    fontSize: 21,
+                                    fontSize: 21.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 8),
+                                SizedBox(height: 8.h),
                                 Text(
                                   banner["Text2"]!,
                                   style: TextStyle(
                                     fontFamily: 'Jomolhari',
                                     color: Colors.white,
-                                    fontSize: 21,
+                                    fontSize: 18.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  child: AnimatedSmoothIndicator(
-                    activeIndex: activeIndex,
-                    count: banners.length,
-                    effect: ExpandingDotsEffect(
-                      expansionFactor: 2.5,
-                      dotHeight: 6,
-                      dotWidth: 10,
-                      activeDotColor: Colors.white,
-                      dotColor: Colors.white.withOpacity(.5),
-
-                      spacing: 5,
+                        );
+                      },
                     ),
-                    onDotClicked: (index) => controller.animateToPage(index),
                   ),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Text(
-                  'Categories',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  'See all',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                SizedBox(width: 5),
-                SvgPicture.asset(
-                  'assets/icons/expand_circle_right_41dp_000000_FILL0_wght400_GRAD0_opsz40.svg',
-                  height: 20,
-                  width: 20,
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  height: 76,
-                  width: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Colors.grey, width: 3),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(100),
-                    child: Transform.scale(
-                      scale: 1.5,
-                      child: Image.asset(
-                        fit: BoxFit.cover,
-                        'assets/images/full-length-portrait-businessman-isolated-gray-wall.jpg',
-                        alignment: Alignment(0, -1.6),
+                  Positioned(
+                    bottom: 10.h,
+                    child: AnimatedSmoothIndicator(
+                      activeIndex: activeIndex,
+                      count: banners.length,
+                      effect: ExpandingDotsEffect(
+                        expansionFactor: 2.5,
+                        dotHeight: 6.h,
+                        dotWidth: 10.w,
+                        activeDotColor: Colors.white,
+                        dotColor: Colors.white.withOpacity(.5),
+                        spacing: 5.w,
                       ),
+                      onDotClicked: (index) => controller.animateToPage(index),
                     ),
                   ),
-                ),
-                Container(
-                  height: 76,
-                  width: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Colors.grey, width: 3),
+                ],
+              ),
+
+              SizedBox(height: 12.h),
+
+              // 🏷️ Categories Section
+              Row(
+                children: [
+                  Text(
+                    'Categories',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(100),
-                    child: Transform.scale(
-                      scale: 1.2,
-                      child: Image.asset(
-                        fit: BoxFit.cover,
-                        'assets/images/high-fashion-look-glamor-stylish-sexy-beautiful-young-woman-model-summer-black-hipster-dress.jpg',
-                        alignment: Alignment(0, -1.4),
+                  const Spacer(),
+                  Text(
+                    'See all',
+                    style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
+                  ),
+                  SizedBox(width: 5.w),
+                  SvgPicture.asset(
+                    'assets/icons/expand_circle_right_41dp_000000_FILL0_wght400_GRAD0_opsz40.svg',
+                    height: 20.h,
+                    width: 20.w,
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 8.h),
+
+              // 👕 Category Circles
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (int i = 0; i < categories.length; i++)
+                    Container(
+                      height: 70.h,
+                      width: 70.w,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(100.r),
+                        border: Border.all(color: Colors.grey, width: 3.w),
                       ),
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 76,
-                  width: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Colors.grey, width: 3),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(100),
-                    child: Transform.scale(
-                      scale: 1.5,
-                      child: Transform.rotate(
-                        angle: -0.2,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(100.r),
                         child: Image.asset(
+                          categories[i],
+                          alignment: i > 1
+                              ? const Alignment(0, -0.5)
+                              : const Alignment(0, -1),
                           fit: BoxFit.cover,
-                          'assets/images/full-shot-modern-boy-posing-with-sunglasses.jpg',
-                          alignment: Alignment(0, -1),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                Container(
-                  height: 76,
-                  width: 76,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: Colors.grey, width: 3),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadiusGeometry.circular(100),
-                    child: Transform.scale(
-                      scale: 1.5,
-                      child: Image.asset(
-                        fit: BoxFit.cover,
-                        'assets/images/little-fashionista-with-shopping-bag-summer-hat-glasses-colored-pink-background-mom-s-shoes-concept-children-s-fashion.jpg',
-                        alignment: Alignment(0, -.8),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 7),
-            Padding(
-              padding: const EdgeInsets.only(left: 1),
-              child: Row(
+                ],
+              ),
+
+              SizedBox(height: 8.h),
+
+              // 🧍 Category Labels
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
                     'Men',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     'Women',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     'Boys',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
                     'Girls',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontFamily: 'Inter',
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
-            ),
-            SizedBox(height: 5),
-            Row(
-              children: [
-                Text(
-                  'All Products',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
+
+              SizedBox(height: 12.h),
+
+              // 🛍️ All Products Section
+              Row(
+                children: [
+                  Text(
+                    'All Products',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Spacer(),
-                Text(
-                  'See all',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.normal,
+                  const Spacer(),
+                  Text(
+                    'See all',
+                    style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
                   ),
-                ),
-                SizedBox(width: 5),
-                SvgPicture.asset(
-                  'assets/icons/expand_circle_right_41dp_000000_FILL0_wght400_GRAD0_opsz40.svg',
-                  height: 20,
-                  width: 20,
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: GridView.builder(
+                  SizedBox(width: 5.w),
+                  SvgPicture.asset(
+                    'assets/icons/expand_circle_right_41dp_000000_FILL0_wght400_GRAD0_opsz40.svg',
+                    height: 20.h,
+                    width: 20.w,
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 7.h),
+
+              // 🧱 Product Grid
+              GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
                 itemCount: products.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10.w,
+                  mainAxisSpacing: 10.h,
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
                   final product = products[index];
                   return Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(15.r),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(15.r),
                           child: GestureDetector(
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Product(),
+                                builder: (context) => const Product(),
                               ),
                             ),
                             child: Container(
-                              color: Colors.grey.shade300,
+                              height: 205.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                               child: Image.asset(
                                 product['image']!,
-                                height: 180,
+                                height: 180.h,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
                         ),
-                        SizedBox(height: 2),
+                        SizedBox(height: 4.h),
                         Text(
                           product['brandname']!,
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
+                            fontSize: 14.sp,
                           ),
                         ),
                         Text(
@@ -427,6 +382,7 @@ class _HomeState extends State<Home> {
                           style: TextStyle(
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
+                            fontSize: 13.sp,
                           ),
                         ),
                         Text(
@@ -435,6 +391,7 @@ class _HomeState extends State<Home> {
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w500,
                             color: Colors.grey[700],
+                            fontSize: 13.sp,
                           ),
                         ),
                       ],
@@ -442,8 +399,8 @@ class _HomeState extends State<Home> {
                   );
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

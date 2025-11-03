@@ -56,7 +56,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
-              onTap: () => setState(() => selectedIndex = 3), // Go to profile
+              onTap: () => setState(() => selectedIndex = 3),
               child: Container(
                 width: 35,
                 height: 35,
@@ -75,6 +75,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
       ),
 
       body: AnimatedSwitcher(
+        switchInCurve: Curves.easeInCubic,
         duration: const Duration(milliseconds: 300),
         child: pages[selectedIndex],
       ),
@@ -122,7 +123,6 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
       backgroundColor: Colors.grey.shade100,
       child: Column(
         children: [
-          // Drawer Header
           DrawerHeader(
             decoration: BoxDecoration(color: Colors.grey.shade300),
             child: Row(
@@ -156,7 +156,6 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
             ),
           ),
 
-          // Drawer Items
           buildDrawerItem(
             icon: Icons.home_outlined,
             text: "Home",
@@ -194,12 +193,10 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
 
           Divider(thickness: 1, color: Colors.grey.shade400),
 
-          // Logout Button
           ListTile(
             leading: Icon(Icons.logout, color: Colors.redAccent),
             title: Text("Logout", style: TextStyle(color: Colors.redAccent)),
             onTap: () {
-              // handle logout logic
               Navigator.pop(context);
             },
           ),

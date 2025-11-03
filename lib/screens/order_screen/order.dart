@@ -80,7 +80,6 @@ class OrderPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Order header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -104,7 +103,6 @@ class OrderPage extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-          // Item list
           Column(
             children: List.generate(order['items'].length, (i) {
               final item = order['items'][i];
@@ -148,7 +146,6 @@ class OrderPage extends StatelessWidget {
           ),
           const Divider(height: 20, thickness: 1),
 
-          // Footer row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

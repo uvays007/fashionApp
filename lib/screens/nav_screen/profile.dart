@@ -11,10 +11,11 @@ class Profile extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(height: 10),
             Center(
               child: Stack(
                 children: [
@@ -73,7 +74,6 @@ class Profile extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // 🛍️ Profile Options List
             _buildProfileOption(
               icon:
                   'assets/icons/orders_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
@@ -112,9 +112,9 @@ class Profile extends StatelessWidget {
               subtitle: "FAQs and contact support",
               onTap: () {},
             ),
+
             const SizedBox(height: 10),
 
-            // 🚪 Logout Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -143,7 +143,6 @@ class Profile extends StatelessWidget {
     );
   }
 
-  // 🔧 Helper Widget for Profile Option
   Widget _buildProfileOption({
     required String icon,
     required String title,

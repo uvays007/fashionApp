@@ -74,7 +74,6 @@ class WishlistPage extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 🖼 Product Image
           Container(
             height: 80,
             width: 80,
@@ -88,7 +87,6 @@ class WishlistPage extends StatelessWidget {
           ),
           const SizedBox(width: 12),
 
-          // 📝 Product Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,8 +135,6 @@ class WishlistPage extends StatelessWidget {
               ],
             ),
           ),
-
-          // 🗑 Remove Icon
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.delete_outline, color: Colors.grey),
