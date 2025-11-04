@@ -1,3 +1,4 @@
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
 
 class WishlistPage extends StatelessWidget {
@@ -5,24 +6,6 @@ class WishlistPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> wishlistItems = [
-      {
-        'name': '2STROKES - Men Tshirt',
-        'price': 'RS. 600',
-        'image': 'assets/images/black_sale.png',
-      },
-      {
-        'name': ' Ortox - Men Tshirt',
-        'price': 'RS. 500',
-        'image': 'assets/images/blue_sale.png',
-      },
-      {
-        'name': 'Gladiator - Men Tshirt',
-        'price': 'RS. 399',
-        'image': 'assets/images/green_sale.png',
-      },
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

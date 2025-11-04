@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/product_screen/product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -72,6 +73,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  List<bool> isLiked = List.generate(products.length, (index) => false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,16 +95,14 @@ class _HomeState extends State<Home> {
                 ),
                 child: TextFormField(
                   decoration: InputDecoration(
-                    suffixIcon: Transform.scale(
-                      scale: 0.5,
-                      child: SvgPicture.asset(
-                        'assets/icons/filter_list_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
-                      ),
+                    suffixIcon: const Icon(Icons.search),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20.h,
+                      vertical: 10.h,
                     ),
-                    prefixIcon: const Icon(Icons.search),
-                    contentPadding: EdgeInsets.symmetric(vertical: 10.h),
                     border: InputBorder.none,
-                    hintText: 'Search',
+                    hintText: 'Search Products',
+
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(12.r)),
                       borderSide: const BorderSide(
@@ -337,65 +337,170 @@ class _HomeState extends State<Home> {
                 ),
                 itemBuilder: (context, index) {
                   final product = products[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15.r),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        ClipRRect(
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.r),
-                          child: GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Product(),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(15.r),
+                              child: GestureDetector(
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const Product(),
+                                  ),
+                                ),
+                                child: Container(
+                                  height: 205.h,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Image.asset(
+                                    product['image']!,
+                                    height: 180.h,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
                             ),
-                            child: Container(
-                              height: 205.h,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(15),
+                            SizedBox(height: 4.h),
+                            Text(
+                              product['brandname']!,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14.sp,
                               ),
-                              child: Image.asset(
-                                product['image']!,
-                                height: 180.h,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+                            ),
+                            Text(
+                              product['name']!,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.sp,
                               ),
+                            ),
+                            Text(
+                              product['price']!,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey[700],
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        right: 10,
+                        top: 5,
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (!isLiked[index]) {
+                              // Ask confirmation only when adding to wishlist
+                              final bool? confirm = await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    title: const Text(
+                                      "Add to Wishlist?",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    content: const Text(
+                                      "Do you really want to add this item to your wishlist?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text(
+                                          "Cancel",
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          wishlistItems.add(
+                                            products[index],
+                                          ); // ✅ Add product first
+                                          Navigator.pop(
+                                            context,
+                                            true,
+                                          ); // ✅ Close the dialog
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFFC19375,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "Yes",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              // If confirmed, update heart color
+                              if (confirm == true) {
+                                setState(() {
+                                  isLiked[index] = true;
+                                });
+                              }
+                            } else {
+                              // If already liked, remove from wishlist directly
+                              setState(() {
+                                isLiked[index] = false;
+                                wishlistItems.remove(
+                                  products[index],
+                                ); // ✅ remove item
+                              });
+                            }
+                          },
+
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) {
+                              return ScaleTransition(
+                                scale: CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.elasticOut,
+                                ),
+                                child: child,
+                              );
+                            },
+                            child: Icon(
+                              isLiked[index]
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                              key: ValueKey<bool>(isLiked[index]),
+                              color: isLiked[index] ? Colors.redAccent : null,
+                              size: isLiked[index] ? 28 : 26,
                             ),
                           ),
                         ),
-                        SizedBox(height: 4.h),
-                        Text(
-                          product['brandname']!,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                        Text(
-                          product['name']!,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13.sp,
-                          ),
-                        ),
-                        Text(
-                          product['price']!,
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[700],
-                            fontSize: 13.sp,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   );
                 },
               ),

@@ -1,7 +1,6 @@
 import 'package:comercial_app/screens/Authentications_screens/signup.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
@@ -14,8 +13,12 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool loading = false;
 
   Future<void> login() async {
+    setState(() {
+      loading = true;
+    });
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -27,10 +30,31 @@ class _LoginState extends State<Login> {
         MaterialPageRoute(builder: (context) => Nav()),
       );
     } on FirebaseAuthException catch (e) {
+      print("Firebase login error code: ${e.code}");
+      String message;
+      switch (e.code) {
+        case 'invalid-email':
+          message = "The email address is not valid.";
+          break;
+        case 'user-not-found':
+          message = "No account found for this email.";
+          break;
+        case 'wrong-password':
+        case 'invalid-credential':
+          message = "The password you entered is incorrect.";
+          break;
+        case 'user-disabled':
+          message = "This user account has been disabled.";
+          break;
+        default:
+          message = "Email Password is incorrect";
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(e.message ?? "Signup Faild")));
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) setState(() => loading = false);
     }
   }
 
@@ -44,7 +68,7 @@ class _LoginState extends State<Login> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 80),
+                const SizedBox(height: 40),
                 const Text(
                   'FITMAX',
                   style: TextStyle(
@@ -61,7 +85,7 @@ class _LoginState extends State<Login> {
                     color: Color(0xFFC19375),
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 40),
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -130,8 +154,14 @@ class _LoginState extends State<Login> {
                       foregroundColor: Colors.white,
                       backgroundColor: const Color(0xFFC19375),
                     ),
-                    onPressed: login,
-                    child: const Text('Log In'),
+                    onPressed: loading ? null : login,
+                    child: loading
+                        ? SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Log In'),
                   ),
                 ),
 
@@ -251,7 +281,6 @@ class _LoginState extends State<Login> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
               ],
             ),
           ),

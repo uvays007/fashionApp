@@ -2,7 +2,7 @@ import 'package:comercial_app/screens/Authentications_screens/login.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // <-- correct import
+// <-- correct import
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -16,7 +16,6 @@ class _SignupState extends State<Signup> {
   final _passwordController = TextEditingController();
   bool _loading = false;
 
-  @override
   Future<void> _signup() async {
     setState(() => _loading = true);
 
@@ -27,13 +26,10 @@ class _SignupState extends State<Signup> {
       );
 
       if (!mounted) return;
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Nav()),
-        );
-      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Nav()),
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -42,13 +38,6 @@ class _SignupState extends State<Signup> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -77,7 +66,7 @@ class _SignupState extends State<Signup> {
                   color: Color(0xFFC19375),
                 ),
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
               const Text(
                 'Create an account',
                 style: TextStyle(
@@ -95,7 +84,7 @@ class _SignupState extends State<Signup> {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
               SizedBox(
                 height: 45,
                 child: TextField(
@@ -187,7 +176,7 @@ class _SignupState extends State<Signup> {
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 10),
               Row(
                 children: const [
                   Expanded(
