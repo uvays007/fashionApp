@@ -219,7 +219,12 @@ class _SignupState extends State<Signup> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.gamepad),
+                      SizedBox(width: 7),
+                      Image.asset(
+                        width: 20,
+                        height: 20,
+                        'assets/images/Google_Favicon_2025.png',
+                      ),
                       const SizedBox(width: 8),
                       const Text('Continue with Google'),
                     ],
@@ -242,7 +247,7 @@ class _SignupState extends State<Signup> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.apple),
+                      Icon(size: 30, Icons.apple),
                       SizedBox(width: 8),
                       const Text('Continue with Apple'),
                     ],

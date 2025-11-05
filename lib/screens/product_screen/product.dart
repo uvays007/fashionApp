@@ -1,8 +1,19 @@
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class Product extends StatelessWidget {
-  const Product({super.key});
+class Product extends StatefulWidget {
+  final Map<String, String> product;
+
+  const Product({super.key, required this.product});
+
+  @override
+  State<Product> createState() => _ProductState();
+}
+
+class _ProductState extends State<Product> {
+  String? selectedSize;
+  Color? selectedColor;
 
   @override
   Widget build(BuildContext context) {
@@ -11,6 +22,7 @@ class Product extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
+            // 🔹 AppBar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -37,12 +49,14 @@ class Product extends StatelessWidget {
               ),
             ),
 
+            // 🔹 Product Body
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Product image
                     Container(
                       margin: const EdgeInsets.only(top: 10, bottom: 20),
                       decoration: BoxDecoration(
@@ -52,27 +66,29 @@ class Product extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image.asset(
-                          'assets/images/black_sale.png',
+                          widget.product['image']!,
                           height: 360,
                           width: double.infinity,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
 
+                    // Product name and price
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
                         Text(
-                          '2STROKE',
-                          style: TextStyle(
+                          widget.product['name'] ?? 'Product Name',
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
                           ),
                         ),
                         Text(
-                          '₹600',
-                          style: TextStyle(
+                          '₹${widget.product['price'] ?? '0'}',
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Inter',
@@ -82,9 +98,9 @@ class Product extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Men T-shirt',
-                      style: TextStyle(
+                    Text(
+                      widget.product['category'] ?? 'Men T-shirt',
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey,
@@ -93,6 +109,8 @@ class Product extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 20),
+
+                    // 🔹 Size selector
                     const Text(
                       'Select Size',
                       style: TextStyle(
@@ -104,21 +122,37 @@ class Product extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: ['S', 'M', 'L', 'XL', 'XXL'].map((size) {
-                        return Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            size,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Inter',
+                        final bool isSelected = selectedSize == size;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedSize = size;
+                            });
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.red
+                                    : Colors.grey.shade300,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Inter',
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: isSelected ? Colors.red : Colors.black,
+                              ),
                             ),
                           ),
                         );
@@ -126,6 +160,8 @@ class Product extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 20),
+
+                    // 🔹 Color selector
                     const Text(
                       'Select Color',
                       style: TextStyle(
@@ -147,6 +183,7 @@ class Product extends StatelessWidget {
 
                     const SizedBox(height: 25),
 
+                    // 🔹 Description
                     const Text(
                       'Description',
                       style: TextStyle(
@@ -156,11 +193,12 @@ class Product extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Stay comfortable all day with our 100% premium cotton t-shirt. '
-                      'Designed with a slim fit and breathable fabric, it’s perfect for daily wear. '
-                      'Pair it with jeans, joggers, or shorts for a stylish casual look.',
-                      style: TextStyle(
+                    Text(
+                      widget.product['description'] ??
+                          'Stay comfortable all day with our 100% premium cotton t-shirt. '
+                              'Designed with a slim fit and breathable fabric, perfect for daily wear. '
+                              'Pair it with jeans, joggers, or shorts for a stylish casual look.',
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
                         fontFamily: 'Inter',
@@ -178,6 +216,7 @@ class Product extends StatelessWidget {
         ),
       ),
 
+      // 🔹 Bottom Add to Cart button
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -192,13 +231,33 @@ class Product extends StatelessWidget {
         ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFFC19375),
+            backgroundColor: const Color(0xFFC19375),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
             minimumSize: const Size(double.infinity, 56),
           ),
-          onPressed: () {},
+          onPressed: () {
+            if (selectedSize == null || selectedColor == null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select size and color')),
+              );
+              return;
+            }
+
+            // Add product to global cart
+            carts.add({
+              'name': widget.product['name'],
+              'price': widget.product['price'],
+              'image': widget.product['image'],
+              'size': selectedSize,
+              'color': selectedColor.toString(),
+            });
+
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Added to cart!')));
+          },
           child: const Text(
             'Add to Cart',
             style: TextStyle(
@@ -213,15 +272,27 @@ class Product extends StatelessWidget {
     );
   }
 
+  // 🔹 Color circle widget
   Widget _colorDot(Color color) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      height: 30,
-      width: 30,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.grey.shade300, width: 1),
+    final bool isSelected = selectedColor == color;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedColor = color;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        height: 30,
+        width: 30,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected ? Colors.blueGrey : Colors.grey.shade300,
+            width: isSelected ? 3 : 1,
+          ),
+        ),
       ),
     );
   }

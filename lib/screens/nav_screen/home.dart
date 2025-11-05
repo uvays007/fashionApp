@@ -13,33 +13,6 @@ final List<String> categories = [
   'assets/images/little-fashionista-with-shopping-bag-summer-hat-glasses-colored-pink-background-mom-s-shoes-concept-children-s-fashion.jpg',
 ];
 
-final List<Map<String, String>> products = [
-  {
-    "brandname": "2STROKE",
-    "name": "Men Tshirt Black",
-    "price": "RS 600",
-    "image": "assets/images/black_sale.png",
-  },
-  {
-    "brandname": "Leventer",
-    "name": "Men Jeans Blue",
-    "price": "RS 1200",
-    "image": "assets/images/tuananh-blue-wNP79A-_bRY-unsplash.jpg",
-  },
-  {
-    "brandname": "Ortox",
-    "name": "Men Tshirt Blue",
-    "price": "RS 500",
-    "image": "assets/images/blue_sale.png",
-  },
-  {
-    "brandname": "Gladiator",
-    "name": "Men Tshirt Green",
-    "price": "RS 399",
-    "image": "assets/images/green_sale.png",
-  },
-];
-
 final List<Map<String, dynamic>> banners = [
   {
     "Text1": "Womens Day",
@@ -73,7 +46,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<bool> isLiked = List.generate(products.length, (index) => false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -352,7 +324,8 @@ class _HomeState extends State<Home> {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const Product(),
+                                    builder: (context) =>
+                                        Product(product: product),
                                   ),
                                 ),
                                 child: Container(
@@ -433,13 +406,11 @@ class _HomeState extends State<Home> {
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                          wishlistItems.add(
-                                            products[index],
-                                          ); // ✅ Add product first
-                                          Navigator.pop(
-                                            context,
-                                            true,
-                                          ); // ✅ Close the dialog
+                                          wishlistItems.add({
+                                            ...product,
+                                            "index": index,
+                                          }); // ✅ Add product first
+                                          Navigator.pop(context, true);
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: const Color(
@@ -471,8 +442,8 @@ class _HomeState extends State<Home> {
                               // If already liked, remove from wishlist directly
                               setState(() {
                                 isLiked[index] = false;
-                                wishlistItems.remove(
-                                  products[index],
+                                wishlistItems.removeWhere(
+                                  (item) => item["index"] == index,
                                 ); // ✅ remove item
                               });
                             }

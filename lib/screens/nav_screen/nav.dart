@@ -2,7 +2,6 @@ import 'package:comercial_app/screens/nav_screen/cart.dart';
 import 'package:comercial_app/screens/nav_screen/home.dart';
 import 'package:comercial_app/screens/nav_screen/profile.dart';
 import 'package:comercial_app/screens/nav_screen/tryon.dart';
-import 'package:comercial_app/screens/notification_screen/notification.dart';
 import 'package:comercial_app/screens/order_screen/order.dart';
 import 'package:comercial_app/screens/wishlist_screen/wishlist.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +16,28 @@ class Nav extends StatefulWidget {
 
 class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
   int selectedIndex = 0;
+  bool showNotifications = false;
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  final List<Map<String, dynamic>> notifications = [
+    {
+      "title": "Order Shipped!",
+      "message": "Your order #FM1234 has been shipped.",
+      "time": "2h ago",
+    },
+    {
+      "title": "Special Discount 🎁",
+      "message": "Get 25% off this weekend!",
+      "time": "5h ago",
+    },
+    {
+      "title": "Delivered ✅",
+      "message": "Your order #FM1129 was delivered.",
+      "time": "1 day ago",
+    },
+  ];
 
   final List<Widget> pages = [Home(), Tryon(), Cart(), Profile()];
 
@@ -28,30 +49,69 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  void toggleNotifications() {
+    setState(() {
+      showNotifications = !showNotifications;
+      showNotifications ? _controller.forward() : _controller.reverse();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: buildDrawer(context),
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade200,
+        backgroundColor: const Color(0xFFC19375),
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'FITMAX',
           style: TextStyle(
             fontFamily: 'LondrinaSolid',
             fontWeight: FontWeight.w600,
             fontSize: 30,
-            color: Color(0xFFC19375),
+            color: Colors.white,
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NotificationPage()),
-              );
-            },
-            icon: Icon(Icons.notifications_none, color: Colors.black87),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                onPressed: toggleNotifications,
+                icon: const Icon(
+                  Icons.notifications_none,
+                  color: Colors.black87,
+                ),
+              ),
+              Positioned(
+                right: 10,
+                top: 10,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
@@ -63,7 +123,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey.shade400, width: 1),
                   borderRadius: BorderRadius.circular(100),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage("assets/images/appi.jpg"),
                     fit: BoxFit.cover,
                   ),
@@ -74,14 +134,89 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
         ],
       ),
 
-      body: AnimatedSwitcher(
-        switchInCurve: Curves.easeInCubic,
-        duration: const Duration(milliseconds: 300),
-        child: pages[selectedIndex],
+      body: Stack(
+        children: [
+          // Main pages
+          AnimatedSwitcher(
+            switchInCurve: Curves.easeInCubic,
+            duration: const Duration(milliseconds: 300),
+            child: pages[selectedIndex],
+          ),
+
+          // Dismiss area
+          if (showNotifications)
+            GestureDetector(
+              onTap: toggleNotifications,
+              child: Container(color: Colors.transparent),
+            ),
+
+          // Animated Notification Dropdown
+          Positioned(
+            right: 10,
+            top: kToolbarHeight + 5,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(12),
+                      itemCount: notifications.length,
+                      separatorBuilder: (_, __) => const Divider(height: 10),
+                      itemBuilder: (context, index) {
+                        final n = notifications[index];
+                        return ListTile(
+                          leading: const Icon(
+                            Icons.notifications,
+                            color: Color(0xFFC19375),
+                          ),
+                          title: Text(
+                            n["title"],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          subtitle: Text(
+                            n["message"],
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          trailing: Text(
+                            n["time"],
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
 
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(color: Colors.grey.shade200),
+        decoration: const BoxDecoration(color: Color(0xFFC19375)),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -103,9 +238,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
                     height: 24,
                     width: 24,
                     colorFilter: ColorFilter.mode(
-                      isSelected
-                          ? Colors.white
-                          : const Color.fromARGB(255, 88, 88, 88),
+                      Colors.white,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -124,10 +257,10 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
       child: Column(
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.grey.shade300),
+            decoration: const BoxDecoration(color: Color(0xFFC19375)),
             child: Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 35,
                   backgroundImage: AssetImage("assets/images/appi.jpg"),
                 ),
@@ -136,7 +269,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: const [
                       Text(
                         "Fazil shaz",
                         style: TextStyle(
@@ -155,7 +288,6 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
-
           buildDrawerItem(
             icon: Icons.home_outlined,
             text: "Home",
@@ -166,39 +298,32 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
             text: "Orders",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => OrderPage()),
+              MaterialPageRoute(builder: (context) => const OrderPage()),
             ),
           ),
-
           buildDrawerItem(
             icon: Icons.favorite_outline,
             text: "Wishlist",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => WishlistPage()),
+              MaterialPageRoute(builder: (context) => const WishlistPage()),
             ),
           ),
           buildDrawerItem(
             icon: Icons.settings_outlined,
             text: "Settings",
-            onTap: () => () {},
+            onTap: () {},
           ),
-          buildDrawerItem(
-            icon: Icons.help_outline,
-            text: "Help",
-            onTap: () => () {},
-          ),
-
+          buildDrawerItem(icon: Icons.help_outline, text: "Help", onTap: () {}),
           const Spacer(),
-
           Divider(thickness: 1, color: Colors.grey.shade400),
-
           ListTile(
-            leading: Icon(Icons.logout, color: Colors.redAccent),
-            title: Text("Logout", style: TextStyle(color: Colors.redAccent)),
-            onTap: () {
-              Navigator.pop(context);
-            },
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.redAccent),
+            ),
+            onTap: () => Navigator.pop(context),
           ),
         ],
       ),
@@ -214,7 +339,7 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
       leading: Icon(icon, color: Colors.black87),
       title: Text(
         text,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
       onTap: () {
         Navigator.pop(context);
@@ -223,9 +348,5 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
     );
   }
 
-  void _navigateTo(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
+  void _navigateTo(int index) => setState(() => selectedIndex = index);
 }

@@ -1,9 +1,14 @@
-import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 
-class WishlistPage extends StatelessWidget {
+class WishlistPage extends StatefulWidget {
   const WishlistPage({super.key});
 
+  @override
+  State<WishlistPage> createState() => _WishlistPageState();
+}
+
+class _WishlistPageState extends State<WishlistPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,15 +19,15 @@ class WishlistPage extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Inter',
             fontWeight: FontWeight.w700,
-            color: Colors.black,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFC19375),
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, true),
         ),
       ),
       body: wishlistItems.isEmpty
@@ -40,14 +45,17 @@ class WishlistPage extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               itemCount: wishlistItems.length,
               itemBuilder: (context, index) {
-                final item = wishlistItems[index];
-                return _buildWishlistItem(item);
+                final wishlistItem = wishlistItems[index];
+
+                final originalIndex = wishlistItem['index'];
+
+                return _buildWishlistItem(wishlistItem, originalIndex);
               },
             ),
     );
   }
 
-  Widget _buildWishlistItem(Map<String, dynamic> item) {
+  Widget _buildWishlistItem(Map<String, dynamic> product, int originalIndex) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
@@ -57,25 +65,28 @@ class WishlistPage extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // --- Product Image ---
           Container(
             height: 80,
             width: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: AssetImage(item['image']),
+                image: AssetImage(product['image']),
                 fit: BoxFit.cover,
               ),
             ),
           ),
+
           const SizedBox(width: 12),
 
+          // --- Product Info ---
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item['name'],
+                  product['name'],
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
@@ -84,7 +95,7 @@ class WishlistPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item['price'],
+                  product['price'],
                   style: const TextStyle(
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w500,
@@ -96,7 +107,14 @@ class WishlistPage extends StatelessWidget {
                 SizedBox(
                   height: 36,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("${product['name']} added to cart"),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFC19375),
                       shape: RoundedRectangleBorder(
@@ -118,8 +136,17 @@ class WishlistPage extends StatelessWidget {
               ],
             ),
           ),
+
+          // --- Delete Button ---
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              setState(() {
+                wishlistItems.removeWhere(
+                  (item) => item['index'] == originalIndex,
+                );
+                isLiked[originalIndex] = false;
+              });
+            },
             icon: const Icon(Icons.delete_outline, color: Colors.grey),
           ),
         ],

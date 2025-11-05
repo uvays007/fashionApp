@@ -1,3 +1,6 @@
+import 'package:comercial_app/screens/global_screen/global.dart';
+import 'package:comercial_app/screens/order_screen/orderpayment.dart';
+import 'package:comercial_app/screens/product_screen/product.dart';
 import 'package:flutter/material.dart';
 
 class Cart extends StatefulWidget {
@@ -45,24 +48,18 @@ class _CartState extends State<Cart> {
                   ),
                   const SizedBox(height: 10),
 
-                  _buildCartItem(
-                    imagePath: 'assets/images/black_sale.png',
-                    title: '2STROKES',
-                    subtitle: 'Men Tshirt',
-                    desc: 'High quality cotton wear',
-                    qty: '01',
-                    price: 'RS.600',
+                  ListView.builder(
+                    itemBuilder: (context, index) {
+                      final cart = carts[index];
+                      return ListTile(
+                        leading: cart['image'],
+                        title: cart['brandname'],
+                        subtitle: cart['name'],
+                        trailing: cart['price'],
+                      );
+                    },
                   ),
-                  const SizedBox(height: 12),
-                  _buildCartItem(
-                    imagePath:
-                        'assets/images/tuananh-blue-wNP79A-_bRY-unsplash.jpg',
-                    title: 'Leventer',
-                    subtitle: 'Men Jeans',
-                    desc: 'High Quality Denimn',
-                    qty: '01',
-                    price: 'RS.1200',
-                  ),
+
                   const Divider(thickness: 1.2),
                   const SizedBox(height: 10),
 
@@ -93,24 +90,26 @@ class _CartState extends State<Cart> {
 
                   const SizedBox(height: 10),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        'Subtotal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: const [
+                        Text(
+                          'Subtotal',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'RS.1450',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        Text(
+                          'RS.1450',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 5),
                   Row(
@@ -177,7 +176,12 @@ class _CartState extends State<Cart> {
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 15),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrderPaymentPage()),
+                );
+              },
               child: const Text(
                 'Place Order',
                 style: TextStyle(

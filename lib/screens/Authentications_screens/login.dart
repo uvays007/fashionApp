@@ -221,7 +221,12 @@ class _LoginState extends State<Login> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.gamepad),
+                        SizedBox(width: 12),
+                        Image.asset(
+                          width: 20,
+                          height: 20,
+                          'assets/images/Google_Favicon_2025.png',
+                        ),
                         const SizedBox(width: 8),
                         const Text('Continue with Google'),
                       ],
@@ -244,8 +249,8 @@ class _LoginState extends State<Login> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.apple),
-                        const SizedBox(width: 8),
+                        Icon(size: 30, Icons.apple),
+                        const SizedBox(width: 3),
                         const Text('Continue with Apple'),
                       ],
                     ),
