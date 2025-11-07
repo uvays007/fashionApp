@@ -14,7 +14,6 @@ class _TryonState extends State<Tryon> {
   String selectedShirtName = "2STROKE MEN Tshirt Black";
   String selectedPantName = "Polo Men Jeans Blue";
 
-  // Original data
   final List<Map<String, String>> shirts = [
     {
       "name": "2STROKE Men Tshirt Black",
@@ -243,7 +242,6 @@ class _TryonState extends State<Tryon> {
     );
   }
 
-  // ✅ Manual Search Function
   void search(bool isShirt, void Function(void Function()) setModalState) {
     final query = _searchController.text.toLowerCase();
 

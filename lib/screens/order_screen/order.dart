@@ -1,44 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:comercial_app/theme/Textstyles.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 
 class OrderPage extends StatelessWidget {
   const OrderPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> orders = [
-      {
-        'orderId': 'ORD12345',
-        'date': 'Oct 12, 2025',
-        'items': [
-          {
-            'name': '2STROKES - Men Tshirt',
-            'price': '600',
-            'image': 'assets/images/black_sale.png',
-          },
-          {
-            'name': ' Ortox - Men Tshirt',
-            'price': '500',
-            'image': 'assets/images/blue_sale.png',
-          },
-        ],
-        'total': 1100,
-        'status': 'Delivered',
-      },
-      {
-        'orderId': 'ORD12346',
-        'date': 'Oct 20, 2025',
-        'items': [
-          {
-            'name': 'Gladiator - Men Tshirt',
-            'price': '399',
-            'image': 'assets/images/green_sale.png',
-          },
-        ],
-        'total': 399,
-        'status': 'In Transit',
-      },
-    ];
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -51,146 +19,169 @@ class OrderPage extends StatelessWidget {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFC19375),
-        elevation: 0.5,
+        backgroundColor: const Color(0xFFC19375),
+        elevation: 2,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-          return _buildOrderCard(order);
-        },
-      ),
-    );
-  }
 
-  Widget _buildOrderCard(Map<String, dynamic> order) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6F6F6),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Order ID: ${order['orderId']}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              Text(
-                order['date'],
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          Column(
-            children: List.generate(order['items'].length, (i) {
-              final item = order['items'][i];
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: AssetImage(item['image']),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        item['name'],
-                        style: const TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'RS ${item['price']}',
-                      style: const TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ),
-          const Divider(height: 20, thickness: 1),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total: RS ${order['total']}',
-                style: const TextStyle(
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(order['status']).withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: orders.isEmpty
+            ? const Center(
                 child: Text(
-                  order['status'],
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: _getStatusColor(order['status']),
-                  ),
+                  "No Orders Yet",
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
+              )
+            : ListView.separated(
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 15),
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+                  final isPlaced = order['isPlaced'] ?? false;
+                  final status = order['status'] ?? "In Transit";
+                  final orderId = order['orderId'] ?? "#0000";
+
+                  return Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            order['image'],
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+
+                        const SizedBox(width: 15),
+
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                order['brandname'],
+                                style: AppTextStyles.semiBold.copyWith(
+                                  fontSize: 15,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                order['name'],
+                                style: AppTextStyles.medium.copyWith(
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Order ID: $orderId",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.circle,
+                                        size: 10,
+                                        color: _getStatusColor(status),
+                                      ),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        status,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: _getStatusColor(status),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+
+                              Row(
+                                children: [
+                                  Icon(
+                                    isPlaced
+                                        ? Icons.check_circle
+                                        : Icons.cancel_outlined,
+                                    color: isPlaced
+                                        ? Colors.green
+                                        : Colors.redAccent,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    isPlaced ? "Order Placed" : "Not Placed",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: isPlaced
+                                          ? Colors.green
+                                          : Colors.redAccent,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10, top: 5),
+                          child: Text(
+                            order['price'],
+                            style: AppTextStyles.bold.copyWith(
+                              fontSize: 15,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
-            ],
-          ),
-        ],
       ),
     );
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'Delivered':
+    switch (status.toLowerCase()) {
+      case 'delivered':
         return Colors.green;
-      case 'In Transit':
+      case 'in transit':
         return Colors.orange;
-      case 'Cancelled':
-        return Colors.red;
+      case 'cancelled':
+        return Colors.redAccent;
       default:
         return Colors.grey;
     }

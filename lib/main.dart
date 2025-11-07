@@ -1,4 +1,5 @@
 import 'package:comercial_app/screens/nav_screen/nav.dart';
+import 'package:comercial_app/screens/onboarding_screen/onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

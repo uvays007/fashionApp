@@ -1,7 +1,10 @@
+import 'package:comercial_app/helper/timehelper.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
 
 class OrderPaymentPage extends StatefulWidget {
-  const OrderPaymentPage({super.key});
+  final String total;
+  const OrderPaymentPage({super.key, required this.total});
 
   @override
   State<OrderPaymentPage> createState() => _OrderPaymentPageState();
@@ -31,10 +34,10 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            _buildSummaryRow("Items Total", "RS.1450"),
+            _buildSummaryRow("Items Total", widget.total),
             _buildSummaryRow("Shipping", "Free"),
             const Divider(),
-            _buildSummaryRow("Total Amount", "RS.1450", bold: true),
+            _buildSummaryRow("Total Amount", widget.total, bold: true),
             const SizedBox(height: 30),
 
             const Text(
@@ -78,7 +81,7 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool bold = false}) {
+  Widget _buildSummaryRow(String label, var value, {bool bold = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -218,8 +221,22 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
                 ),
               ),
               onPressed: () {
-                Navigator.pop(context); // close dialog
-                Navigator.pop(context); // go back to Cart or Home
+                orders.addAll(carts);
+
+                String productNames = carts
+                    .map((item) => item['name'])
+                    .join(", ");
+
+                notifications.add({
+                  "message":
+                      "Your order for $productNames has been placed successfully!",
+                  "time": timeAgo(DateTime.now()),
+                });
+
+                carts.clear();
+
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: const Text("OK", style: TextStyle(color: Colors.white)),
             ),

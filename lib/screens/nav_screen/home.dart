@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:comercial_app/screens/AllProducts_screen/allproducts.dart';
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/product_screen/product.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,8 @@ final List<Map<String, dynamic>> banners = [
 
 int activeIndex = 0;
 final CarouselSliderController controller = CarouselSliderController();
+final searchController = TextEditingController();
+List<Map<String, String>> filteredproducts = [];
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -46,6 +49,34 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  @override
+  void initState() {
+    super.initState();
+    filteredproducts = List.from(products);
+  }
+
+  void search() {
+    final query = searchController.text.toLowerCase();
+
+    if (query.isEmpty) {
+      setState(() {
+        filteredproducts = List.from(products);
+      });
+      return;
+    }
+
+    final matches = products
+        .where((item) => item['brandname']!.toLowerCase().contains(query))
+        .toList();
+    final nonmatches = products
+        .where((item) => !item['brandname']!.toLowerCase().contains(query))
+        .toList();
+
+    setState(() {
+      filteredproducts = [...matches, ...nonmatches];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,7 +89,6 @@ class _HomeState extends State<Home> {
             children: [
               SizedBox(height: 7.h),
 
-              // 🔍 Search Bar
               Container(
                 height: 45.h,
                 decoration: BoxDecoration(
@@ -66,8 +96,13 @@ class _HomeState extends State<Home> {
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: TextFormField(
+                  onChanged: (_) => search(),
+                  controller: searchController,
                   decoration: InputDecoration(
-                    suffixIcon: const Icon(Icons.search),
+                    suffixIcon: GestureDetector(
+                      onTap: search,
+                      child: Icon(Icons.search),
+                    ),
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: 20.h,
                       vertical: 10.h,
@@ -87,8 +122,6 @@ class _HomeState extends State<Home> {
               ),
 
               SizedBox(height: 10.h),
-
-              // 🖼️ Banner Carousel
               Stack(
                 alignment: Alignment.bottomCenter,
                 children: [
@@ -176,7 +209,6 @@ class _HomeState extends State<Home> {
 
               SizedBox(height: 12.h),
 
-              // 🏷️ Categories Section
               Row(
                 children: [
                   Text(
@@ -202,8 +234,6 @@ class _HomeState extends State<Home> {
               ),
 
               SizedBox(height: 8.h),
-
-              // 👕 Category Circles
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -269,7 +299,6 @@ class _HomeState extends State<Home> {
 
               SizedBox(height: 12.h),
 
-              // 🛍️ All Products Section
               Row(
                 children: [
                   Text(
@@ -281,9 +310,17 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                    'See all',
-                    style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Allproducts()),
+                      );
+                    },
+                    child: Text(
+                      'See all',
+                      style: TextStyle(fontSize: 14.sp, fontFamily: 'Inter'),
+                    ),
                   ),
                   SizedBox(width: 5.w),
                   SvgPicture.asset(
@@ -296,11 +333,10 @@ class _HomeState extends State<Home> {
 
               SizedBox(height: 7.h),
 
-              // 🧱 Product Grid
               GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: products.length,
+                itemCount: filteredproducts.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 10.w,
@@ -308,7 +344,7 @@ class _HomeState extends State<Home> {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product = filteredproducts[index];
                   return Stack(
                     children: [
                       Container(
@@ -378,7 +414,6 @@ class _HomeState extends State<Home> {
                         child: GestureDetector(
                           onTap: () async {
                             if (!isLiked[index]) {
-                              // Ask confirmation only when adding to wishlist
                               final bool? confirm = await showDialog(
                                 context: context,
                                 builder: (context) {
@@ -409,7 +444,7 @@ class _HomeState extends State<Home> {
                                           wishlistItems.add({
                                             ...product,
                                             "index": index,
-                                          }); // ✅ Add product first
+                                          });
                                           Navigator.pop(context, true);
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -432,19 +467,17 @@ class _HomeState extends State<Home> {
                                 },
                               );
 
-                              // If confirmed, update heart color
                               if (confirm == true) {
                                 setState(() {
                                   isLiked[index] = true;
                                 });
                               }
                             } else {
-                              // If already liked, remove from wishlist directly
                               setState(() {
                                 isLiked[index] = false;
                                 wishlistItems.removeWhere(
                                   (item) => item["index"] == index,
-                                ); // ✅ remove item
+                                );
                               });
                             }
                           },

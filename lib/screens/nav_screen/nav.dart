@@ -1,3 +1,4 @@
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/nav_screen/cart.dart';
 import 'package:comercial_app/screens/nav_screen/home.dart';
 import 'package:comercial_app/screens/nav_screen/profile.dart';
@@ -20,24 +21,6 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-
-  final List<Map<String, dynamic>> notifications = [
-    {
-      "title": "Order Shipped!",
-      "message": "Your order #FM1234 has been shipped.",
-      "time": "2h ago",
-    },
-    {
-      "title": "Special Discount 🎁",
-      "message": "Get 25% off this weekend!",
-      "time": "5h ago",
-    },
-    {
-      "title": "Delivered ✅",
-      "message": "Your order #FM1129 was delivered.",
-      "time": "1 day ago",
-    },
-  ];
 
   final List<Widget> pages = [Home(), Tryon(), Cart(), Profile()];
 
@@ -143,14 +126,12 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
             child: pages[selectedIndex],
           ),
 
-          // Dismiss area
           if (showNotifications)
             GestureDetector(
               onTap: toggleNotifications,
               child: Container(color: Colors.transparent),
             ),
 
-          // Animated Notification Dropdown
           Positioned(
             right: 10,
             top: kToolbarHeight + 5,
@@ -187,18 +168,15 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
                             color: Color(0xFFC19375),
                           ),
                           title: Text(
-                            n["title"],
+                            n["message"],
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
                           ),
-                          subtitle: Text(
-                            n["message"],
-                            style: const TextStyle(fontSize: 12),
-                          ),
+
                           trailing: Text(
-                            n["time"],
+                            n["time"].toString(),
                             style: const TextStyle(
                               fontSize: 11,
                               color: Colors.grey,

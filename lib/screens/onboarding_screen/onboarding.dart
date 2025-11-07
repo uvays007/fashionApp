@@ -1,4 +1,4 @@
-import 'package:comercial_app/screens/Authentications_screens/login.dart';
+import 'package:comercial_app/screens/Authentications_screens/signup.dart';
 import 'package:flutter/material.dart';
 
 class Onboarding extends StatefulWidget {
@@ -93,7 +93,7 @@ class _OnboardingState extends State<Onboarding> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Login()),
+                          MaterialPageRoute(builder: (context) => Signup()),
                         );
                       },
                       child: const Text(

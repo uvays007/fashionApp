@@ -18,45 +18,21 @@ class _ProductState extends State<Product> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFC19375),
+        foregroundColor: Colors.white,
+      ),
+
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
-            // 🔹 AppBar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: SvgPicture.asset(
-                      "assets/icons/keyboard_arrow_left_24dp_000000_FILL0_wght400_GRAD0_opsz24.svg",
-                      height: 32,
-                      width: 32,
-                    ),
-                  ),
-                  const Text(
-                    "Product Details",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  const SizedBox(width: 32),
-                ],
-              ),
-            ),
-
-            // 🔹 Product Body
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product image
                     Container(
                       margin: const EdgeInsets.only(top: 10, bottom: 20),
                       decoration: BoxDecoration(
@@ -74,7 +50,6 @@ class _ProductState extends State<Product> {
                       ),
                     ),
 
-                    // Product name and price
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -110,7 +85,6 @@ class _ProductState extends State<Product> {
 
                     const SizedBox(height: 20),
 
-                    // 🔹 Size selector
                     const Text(
                       'Select Size',
                       style: TextStyle(
@@ -161,7 +135,6 @@ class _ProductState extends State<Product> {
 
                     const SizedBox(height: 20),
 
-                    // 🔹 Color selector
                     const Text(
                       'Select Color',
                       style: TextStyle(
@@ -183,7 +156,6 @@ class _ProductState extends State<Product> {
 
                     const SizedBox(height: 25),
 
-                    // 🔹 Description
                     const Text(
                       'Description',
                       style: TextStyle(
@@ -216,7 +188,6 @@ class _ProductState extends State<Product> {
         ),
       ),
 
-      // 🔹 Bottom Add to Cart button
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -245,13 +216,11 @@ class _ProductState extends State<Product> {
               return;
             }
 
-            // Add product to global cart
             carts.add({
               'name': widget.product['name'],
               'price': widget.product['price'],
               'image': widget.product['image'],
-              'size': selectedSize,
-              'color': selectedColor.toString(),
+              'brandname': widget.product['brandname'],
             });
 
             ScaffoldMessenger.of(
@@ -272,7 +241,6 @@ class _ProductState extends State<Product> {
     );
   }
 
-  // 🔹 Color circle widget
   Widget _colorDot(Color color) {
     final bool isSelected = selectedColor == color;
     return GestureDetector(

@@ -33,7 +33,7 @@ class _WishlistPageState extends State<WishlistPage> {
       body: wishlistItems.isEmpty
           ? const Center(
               child: Text(
-                "Your wishlist is empty 🛍️",
+                "Your wishlist is empty",
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
@@ -65,7 +65,6 @@ class _WishlistPageState extends State<WishlistPage> {
       ),
       child: Row(
         children: [
-          // --- Product Image ---
           Container(
             height: 80,
             width: 80,
@@ -80,7 +79,6 @@ class _WishlistPageState extends State<WishlistPage> {
 
           const SizedBox(width: 12),
 
-          // --- Product Info ---
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,6 +106,7 @@ class _WishlistPageState extends State<WishlistPage> {
                   height: 36,
                   child: ElevatedButton(
                     onPressed: () {
+                      carts.add(product);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text("${product['name']} added to cart"),
@@ -137,7 +136,6 @@ class _WishlistPageState extends State<WishlistPage> {
             ),
           ),
 
-          // --- Delete Button ---
           IconButton(
             onPressed: () {
               setState(() {
