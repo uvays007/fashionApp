@@ -1,5 +1,6 @@
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/product_screen/product.dart';
+import 'package:comercial_app/theme/Textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,7 +11,11 @@ class Allproducts extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("All Products"),
+        centerTitle: true,
+        title: Text(
+          "All Products",
+          style: AppTextStyles.semiBold.copyWith(color: Colors.white),
+        ),
         backgroundColor: const Color(0xFFC19375),
         foregroundColor: Colors.white,
       ),

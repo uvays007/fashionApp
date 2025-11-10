@@ -233,10 +233,8 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
                   "time": timeAgo(DateTime.now()),
                 });
 
-                carts.clear();
-
                 Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.pop(context, true);
               },
               child: const Text("OK", style: TextStyle(color: Colors.white)),
             ),

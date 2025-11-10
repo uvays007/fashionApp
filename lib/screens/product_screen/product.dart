@@ -1,6 +1,5 @@
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class Product extends StatefulWidget {
   final Map<String, String> product;
@@ -12,8 +11,8 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
-  String? selectedSize;
-  Color? selectedColor;
+  String selectedSize = 'M';
+  Color selectedColor = Colors.black;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +96,14 @@ class _ProductState extends State<Product> {
                     Row(
                       children: ['S', 'M', 'L', 'XL', 'XXL'].map((size) {
                         final bool isSelected = selectedSize == size;
+                        double sizepadding;
+                        if (size == 'XL') {
+                          sizepadding = 15;
+                        } else if (size == 'XXL') {
+                          sizepadding = 10;
+                        } else {
+                          sizepadding = 20;
+                        }
                         return GestureDetector(
                           onTap: () {
                             setState(() {
@@ -104,9 +111,10 @@ class _ProductState extends State<Product> {
                             });
                           },
                           child: Container(
-                            margin: const EdgeInsets.only(right: 8),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
+                            margin: EdgeInsets.only(right: 8),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: sizepadding,
+
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
@@ -211,7 +219,10 @@ class _ProductState extends State<Product> {
           onPressed: () {
             if (selectedSize == null || selectedColor == null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select size and color')),
+                const SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text('Please select size and color'),
+                ),
               );
               return;
             }
@@ -257,7 +268,9 @@ class _ProductState extends State<Product> {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected ? Colors.blueGrey : Colors.grey.shade300,
+            color: isSelected
+                ? Color.fromARGB(255, 149, 101, 69)
+                : Colors.grey.shade300,
             width: isSelected ? 3 : 1,
           ),
         ),

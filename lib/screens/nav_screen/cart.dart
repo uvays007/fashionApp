@@ -59,8 +59,8 @@ class _CartState extends State<Cart> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => OrderPaymentPage(
@@ -68,6 +68,11 @@ class _CartState extends State<Cart> {
                       ),
                     ),
                   );
+                  if (result == true) {
+                    setState(() {
+                      carts.clear();
+                    });
+                  }
                 },
                 child: const Text(
                   'Place Order',
@@ -82,7 +87,16 @@ class _CartState extends State<Cart> {
             ),
 
       body: carts.isEmpty
-          ? const Center(child: Text("Your Cart is Empty"))
+          ? const Center(
+              child: Text(
+                "Your Cart is Empty",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            )
           : SafeArea(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),

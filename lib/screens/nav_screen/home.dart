@@ -144,7 +144,7 @@ class _HomeState extends State<Home> {
                         return Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 6, 109, 144),
+                            color: const Color.fromARGB(255, 31, 151, 169),
                             image: DecorationImage(
                               alignment:
                                   banner["alignment"] ?? Alignment(0, -0.3),
@@ -262,7 +262,6 @@ class _HomeState extends State<Home> {
 
               SizedBox(height: 8.h),
 
-              // 🧍 Category Labels
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [

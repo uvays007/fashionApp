@@ -50,7 +50,7 @@ class _OnboardingState extends State<Onboarding> {
                     end: Alignment.bottomRight,
                   ).createShader(bounds),
                   child: const Text(
-                    'Choose\nYour\nPerfect Fashion',
+                    'Choose\nYour Own\nPerfect Fashion',
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,

@@ -119,7 +119,6 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
 
       body: Stack(
         children: [
-          // Main pages
           AnimatedSwitcher(
             switchInCurve: Curves.easeInCubic,
             duration: const Duration(milliseconds: 300),

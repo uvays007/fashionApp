@@ -1,3 +1,4 @@
+import 'package:comercial_app/helper/passwordvalidation.dart';
 import 'package:comercial_app/screens/Authentications_screens/login.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,13 +12,53 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
+  String? usernameerror;
+  String? emailerror;
+  String? passworderror;
+
+  bool haserror = false;
 
   Future<void> _signup() async {
-    setState(() => _loading = true);
+    haserror = false;
+    setState(() {
+      usernameerror = null;
+      emailerror = null;
+      passworderror = null;
+    });
+    if (_usernameController.text.trim().isEmpty) {
+      setState(() {
+        usernameerror = "Please enter your username";
+      });
+      haserror = true;
+    }
+    if (_emailController.text.trim().isEmpty) {
+      setState(() {
+        emailerror = "Please enter your email";
+      });
+      haserror = true;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      setState(() {
+        passworderror = "Please enter your password";
+      });
+      haserror = true;
+    }
+    if (haserror) return;
 
+    final passwordValidation = validatePassword(
+      _passwordController.text.trim(),
+    );
+    if (passwordValidation != null) {
+      setState(() {
+        passworderror = passwordValidation;
+      });
+      return;
+    }
+    setState(() => _loading = true);
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -30,10 +71,19 @@ class _SignupState extends State<Signup> {
         MaterialPageRoute(builder: (context) => const Nav()),
       );
     } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'email-already-in-use':
+          setState(() => emailerror = "This email is already registered");
+          break;
+        case 'invalid-email':
+          setState(() => emailerror = "Invalid email address");
+          break;
+        default:
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Signup failed. Please try again.")),
+          );
+      }
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message ?? "Signup failed")));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -48,7 +98,7 @@ class _SignupState extends State<Signup> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 130),
+              const SizedBox(height: 50),
               const Text(
                 'FITMAX',
                 style: TextStyle(
@@ -83,41 +133,76 @@ class _SignupState extends State<Signup> {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 45,
-                child: TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF828282)),
-                    ),
-                    hintText: 'Enter your Email',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+              SizedBox(height: 12),
+
+              TextField(
+                onChanged: (_) {
+                  if (usernameerror != null) {
+                    setState(() {
+                      usernameerror = null;
+                    });
+                  }
+                },
+                controller: _usernameController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  errorText: usernameerror,
+                  contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF828282)),
+                  ),
+                  hintText: 'Username',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 45,
-                child: TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Color(0xFF828282)),
-                    ),
-                    hintText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+              TextField(
+                onChanged: (_) {
+                  if (emailerror != null) {
+                    setState(() {
+                      emailerror = null;
+                    });
+                  }
+                },
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  errorText: emailerror,
+                  contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF828282)),
+                  ),
+                  hintText: 'Enter your Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                onChanged: (_) {
+                  if (passworderror != null) {
+                    setState(() {
+                      passworderror = null;
+                    });
+                  }
+                },
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  errorText: passworderror,
+                  contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF828282)),
+                  ),
+                  hintText: 'Password',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
               ),
@@ -202,7 +287,7 @@ class _SignupState extends State<Signup> {
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -212,13 +297,12 @@ class _SignupState extends State<Signup> {
                     ),
                     foregroundColor: Colors.black,
                     backgroundColor: const Color(0xFFEEEEEE),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () {},
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(width: 7),
+                      SizedBox(width: 12),
                       Image.asset(
                         width: 20,
                         height: 20,
@@ -230,7 +314,8 @@ class _SignupState extends State<Signup> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -240,20 +325,19 @@ class _SignupState extends State<Signup> {
                     ),
                     foregroundColor: Colors.black,
                     backgroundColor: const Color(0xFFEEEEEE),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                   onPressed: () {},
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(size: 30, Icons.apple),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 3),
                       const Text('Continue with Apple'),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 20),
               const Text(
                 'By clicking continue, you agree to our Terms of Service and Privacy Policy',
                 textAlign: TextAlign.center,

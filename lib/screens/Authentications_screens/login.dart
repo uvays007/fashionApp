@@ -13,46 +13,80 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? emailError;
+  String? passwordError;
   bool loading = false;
+  bool haserror = false;
 
   Future<void> login() async {
+    haserror = false;
     setState(() {
-      loading = true;
+      emailError = null;
+      passwordError = null;
     });
+
+    // Basic validation
+    if (_emailController.text.trim().isEmpty) {
+      setState(() => emailError = "Please enter your email");
+      haserror = true;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      setState(() => passwordError = "Please enter your password");
+      haserror = true;
+    }
+    if (haserror) return;
+
+    setState(() => loading = true);
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Nav()),
+        MaterialPageRoute(builder: (context) => const Nav()),
       );
     } on FirebaseAuthException catch (e) {
-      print("Firebase login error code: ${e.code}");
-      String message;
       switch (e.code) {
+        case 'email-already-in-use':
+          setState(() => emailError = "This email is already registered");
+          break;
+
         case 'invalid-email':
-          message = "The email address is not valid.";
+          setState(() => emailError = "Invalid email address");
           break;
-        case 'user-not-found':
-          message = "No account found for this email.";
+
+        case 'weak-password':
+          setState(() => passwordError = "Password is too weak");
           break;
-        case 'wrong-password':
-        case 'invalid-credential':
-          message = "The password you entered is incorrect.";
+        case 'invalid-password':
+          setState(() => passwordError = "");
           break;
-        case 'user-disabled':
-          message = "This user account has been disabled.";
+
+        case 'operation-not-allowed':
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Email/password sign-up not enabled."),
+            ),
+          );
           break;
+
+        case 'too-many-requests':
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Too many attempts. Try again later."),
+            ),
+          );
+          break;
+
         default:
-          message = "Email Password is incorrect";
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Sign-up failed. Please try again.")),
+          );
       }
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -85,7 +119,7 @@ class _LoginState extends State<Login> {
                     color: Color(0xFFC19375),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -106,40 +140,41 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 40),
 
-                SizedBox(
-                  height: 40,
-                  child: TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFF828282)),
-                      ),
-                      hintText: 'Enter your Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                TextField(
+                  onChanged: (_) {
+                    if (emailError != null) {
+                      setState(() => emailError = null);
+                    }
+                  },
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    errorText: emailError,
+                    contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF828282)),
+                    ),
+                    hintText: 'Enter your Email',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
 
-                SizedBox(
-                  height: 40,
-                  child: TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFF828282)),
-                      ),
-                      hintText: 'Enter your Password',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    errorText: passwordError,
+                    contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF828282)),
+                    ),
+                    hintText: 'Enter your Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                 ),
@@ -233,7 +268,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 5),
 
                 SizedBox(
                   width: double.infinity,
