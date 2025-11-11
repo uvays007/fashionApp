@@ -139,13 +139,12 @@ class _WishlistPageState extends State<WishlistPage> {
                       height: 36,
                       child: ElevatedButton(
                         onPressed: () {
-                          carts.add(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("${product['name']} added to cart"),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          setState(() {
+                            wishlistItems.removeWhere(
+                              (item) => item['index'] == originalIndex,
+                            );
+                            isLiked[originalIndex] = false;
+                          });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFC19375),

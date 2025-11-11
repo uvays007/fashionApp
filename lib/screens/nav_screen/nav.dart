@@ -72,46 +72,32 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
           ),
         ),
         actions: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                onPressed: toggleNotifications,
-                icon: const Icon(
-                  Icons.notifications_none,
-                  color: Colors.black87,
-                ),
-              ),
-              Positioned(
-                right: 10,
-                top: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
+          IconButton(
+            onPressed: toggleNotifications,
+            icon: const Icon(Icons.notifications_none, color: Colors.black87),
           ),
+
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
               onTap: () => setState(() => selectedIndex = 3),
-              child: Container(
-                width: 35,
-                height: 35,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400, width: 1),
-                  borderRadius: BorderRadius.circular(100),
-                  image: const DecorationImage(
-                    image: AssetImage("assets/images/appi.jpg"),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+              child: selectedIndex == 0
+                  ? Container(
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey.shade400,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(100),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/appi.jpg"),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  : SizedBox.shrink(),
             ),
           ),
         ],

@@ -217,16 +217,6 @@ class _ProductState extends State<Product> {
             minimumSize: const Size(double.infinity, 56),
           ),
           onPressed: () {
-            if (selectedSize == null || selectedColor == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  backgroundColor: Colors.red,
-                  content: Text('Please select size and color'),
-                ),
-              );
-              return;
-            }
-
             carts.add({
               'name': widget.product['name'],
               'price': widget.product['price'],
