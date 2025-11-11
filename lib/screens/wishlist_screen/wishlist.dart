@@ -102,50 +102,73 @@ class _WishlistPageState extends State<WishlistPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                SizedBox(
-                  height: 36,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      carts.add(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("${product['name']} added to cart"),
-                          behavior: SnackBarBehavior.floating,
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 36,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          carts.add(product);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("${product['name']} added to cart"),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFC19375),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFC19375),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                    ),
-                    child: const Text(
-                      "Add to Cart",
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Colors.white,
+                        child: const Text(
+                          "Add to Cart",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    SizedBox(width: 35),
+                    SizedBox(
+                      height: 36,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          carts.add(product);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("${product['name']} added to cart"),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFC19375),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                        ),
+                        child: const Text(
+                          "Remove",
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ),
-
-          IconButton(
-            onPressed: () {
-              setState(() {
-                wishlistItems.removeWhere(
-                  (item) => item['index'] == originalIndex,
-                );
-                isLiked[originalIndex] = false;
-              });
-            },
-            icon: const Icon(Icons.delete_outline, color: Colors.grey),
           ),
         ],
       ),
