@@ -65,11 +65,19 @@ class OrderPage extends StatelessWidget {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            order['image'],
-                            width: 70,
-                            height: 70,
-                            fit: BoxFit.cover,
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                order['image'],
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              ),
+                              Text(
+                                'Qty: ${order['qty'].toString()}',
+                                style: AppTextStyles.bold,
+                              ),
+                            ],
                           ),
                         ),
 
@@ -95,8 +103,6 @@ class OrderPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 6),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Order ID: $orderId",
@@ -105,49 +111,61 @@ class OrderPage extends StatelessWidget {
                                       color: Colors.grey.shade700,
                                     ),
                                   ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.circle,
-                                        size: 10,
-                                        color: _getStatusColor(status),
-                                      ),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        status,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: _getStatusColor(status),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                  SizedBox(width: 10),
+                                  Icon(
+                                    Icons.circle,
+                                    size: 10,
+                                    color: _getStatusColor(status),
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    status,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: _getStatusColor(status),
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 5),
 
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    isPlaced
-                                        ? Icons.check_circle
-                                        : Icons.cancel_outlined,
-                                    color: isPlaced
-                                        ? Colors.green
-                                        : Colors.redAccent,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 5),
                                   Text(
-                                    isPlaced ? "Order Placed" : "Not Placed",
+                                    'size: ${order['size']}',
                                     style: TextStyle(
-                                      fontSize: 13,
-                                      color: isPlaced
-                                          ? Colors.green
-                                          : Colors.redAccent,
-                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700,
                                     ),
+                                  ),
+
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        isPlaced
+                                            ? Icons.check_circle
+                                            : Icons.cancel_outlined,
+                                        color: isPlaced
+                                            ? Colors.green
+                                            : Colors.redAccent,
+                                        size: 18,
+                                      ),
+                                      Text(
+                                        isPlaced
+                                            ? "Order Placed"
+                                            : "Not Placed",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: isPlaced
+                                              ? Colors.green
+                                              : Colors.redAccent,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -156,7 +174,7 @@ class OrderPage extends StatelessWidget {
                         ),
 
                         Padding(
-                          padding: const EdgeInsets.only(left: 10, top: 5),
+                          padding: const EdgeInsets.only(left: 10, top: 30),
                           child: Text(
                             order['price'],
                             style: AppTextStyles.bold.copyWith(

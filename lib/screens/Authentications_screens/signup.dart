@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comercial_app/helper/passwordvalidation.dart';
 import 'package:comercial_app/screens/Authentications_screens/login.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class _SignupState extends State<Signup> {
   String? passworderror;
 
   bool haserror = false;
+  bool ispasswordvisible = true;
 
   Future<void> _signup() async {
     haserror = false;
@@ -70,6 +73,12 @@ class _SignupState extends State<Signup> {
         context,
         MaterialPageRoute(builder: (context) => const Nav()),
       );
+      final firestore = FirebaseFirestore.instance;
+      await firestore.collection('users').add({
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim(),
+      });
+      docemail = _emailController.text.trim();
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -192,7 +201,7 @@ class _SignupState extends State<Signup> {
                   }
                 },
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: ispasswordvisible,
                 decoration: InputDecoration(
                   errorText: passworderror,
                   contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
@@ -203,6 +212,26 @@ class _SignupState extends State<Signup> {
                   hintText: 'Password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
+                  ),
+                  suffixIcon: GestureDetector(
+                    onTapDown: (_) {
+                      setState(() {
+                        ispasswordvisible = false;
+                      });
+                    },
+                    onTapUp: (_) {
+                      setState(() {
+                        ispasswordvisible = true;
+                      });
+                    },
+                    onTapCancel: () {
+                      setState(() {
+                        ispasswordvisible = true;
+                      });
+                    },
+                    child: ispasswordvisible
+                        ? Icon(Icons.visibility_off)
+                        : Icon(Icons.visibility),
                   ),
                 ),
               ),

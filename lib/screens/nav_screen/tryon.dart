@@ -488,7 +488,7 @@ class _TryonState extends State<Tryon> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
-                  fontFamily: 'Jomolhari',
+                  fontFamily: 'Roboto',
                 ),
               ),
               const SizedBox(height: 5),
@@ -525,7 +525,7 @@ class _TryonState extends State<Tryon> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w400,
-                  fontFamily: 'Jomolhari',
+                  fontFamily: 'Roboto',
                 ),
               ),
               const SizedBox(height: 5),

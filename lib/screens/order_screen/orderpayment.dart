@@ -12,11 +12,20 @@ class OrderPaymentPage extends StatefulWidget {
 
 class _OrderPaymentPageState extends State<OrderPaymentPage> {
   String _selectedPayment = "UPI";
+
   final TextEditingController _upiController = TextEditingController();
   final TextEditingController _cardController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _couponController = TextEditingController();
+
+  double discount = 0;
+  bool couponApplied = false;
 
   @override
   Widget build(BuildContext context) {
+    double originalTotal = double.tryParse(widget.total) ?? 0;
+    double finalTotal = (originalTotal - discount).clamp(0, double.infinity);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -29,17 +38,91 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
         child: ListView(
           children: [
             const SizedBox(height: 10),
+
+            // ---------------- ORDER SUMMARY ----------------
             const Text(
               "Order Summary",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            _buildSummaryRow("Items Total", widget.total),
+
+            _buildSummaryRow("Items Total", "Rs.$originalTotal"),
             _buildSummaryRow("Shipping", "Free"),
+
+            if (discount > 0)
+              _buildSummaryRow(
+                "Discount",
+                "- Rs.$discount",
+                bold: true,
+                color: Colors.green,
+              ),
+
             const Divider(),
-            _buildSummaryRow("Total Amount", widget.total, bold: true),
+            _buildSummaryRow("Total Amount", "Rs.$finalTotal", bold: true),
+
             const SizedBox(height: 30),
 
+            // ---------------- ADDRESS SECTION ----------------
+            const Text(
+              "Delivery Address",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            TextField(
+              controller: _addressController,
+              maxLines: 3,
+              decoration: InputDecoration(
+                hintText: "Enter your home address...",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // ---------------- COUPON SECTION ----------------
+            const Text(
+              "Apply Coupon",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _couponController,
+                    decoration: InputDecoration(
+                      hintText: "Enter coupon code",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC19375),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _applyCoupon,
+                  child: Text(
+                    couponApplied ? "Applied" : "Apply",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            // ---------------- PAYMENT METHOD ----------------
             const Text(
               "Select Payment Method",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -50,10 +133,12 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
             _buildPaymentOption("Debit Card"),
 
             const SizedBox(height: 20),
+
             if (_selectedPayment == "UPI") _buildUPISection(),
             if (_selectedPayment == "Debit Card") _buildCardSection(),
 
             const SizedBox(height: 40),
+
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFC19375),
@@ -63,7 +148,17 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
                 padding: const EdgeInsets.symmetric(vertical: 15),
               ),
               onPressed: () {
-                _showPaymentSuccess(context);
+                if (_addressController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Please enter delivery address"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                _showPaymentSuccess(context, finalTotal);
               },
               child: const Text(
                 "Confirm & Pay",
@@ -71,7 +166,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
                   color: Colors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Inter',
                 ),
               ),
             ),
@@ -81,7 +175,13 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     );
   }
 
-  Widget _buildSummaryRow(String label, var value, {bool bold = false}) {
+  // ---------------------- UI HELPERS ----------------------
+  Widget _buildSummaryRow(
+    String label,
+    String value, {
+    bool bold = false,
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
@@ -98,6 +198,7 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
             value,
             style: TextStyle(
               fontSize: 16,
+              color: color,
               fontWeight: bold ? FontWeight.bold : FontWeight.w500,
             ),
           ),
@@ -113,9 +214,7 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
       groupValue: _selectedPayment,
       activeColor: const Color(0xFFC19375),
       onChanged: (value) {
-        setState(() {
-          _selectedPayment = value!;
-        });
+        setState(() => _selectedPayment = value!);
       },
     );
   }
@@ -192,7 +291,46 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     );
   }
 
-  void _showPaymentSuccess(BuildContext context) {
+  // ---------------------- APPLY COUPON ----------------------
+  void _applyCoupon() {
+    String code = _couponController.text.trim().toUpperCase();
+
+    if (code == "SAVE10") {
+      setState(() {
+        discount = (double.parse(widget.total) * 0.10);
+        couponApplied = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Coupon Applied! 10% discount"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else if (code == "WELCOME50") {
+      setState(() {
+        discount = 50;
+        couponApplied = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("₹50 OFF applied!"),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Invalid coupon code"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // ---------------------- PAYMENT SUCCESS ----------------------
+  void _showPaymentSuccess(BuildContext context, double finalTotal) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -208,8 +346,8 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Your order has been placed successfully.",
+            Text(
+              "Your order has been placed.\nTotal Paid: Rs.$finalTotal",
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),

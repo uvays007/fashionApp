@@ -1,4 +1,5 @@
 import 'package:comercial_app/screens/Authentications_screens/signup.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class _LoginState extends State<Login> {
   String? passwordError;
   bool loading = false;
   bool haserror = false;
+  bool ispasswordvisible = true;
 
   Future<void> login() async {
     haserror = false;
@@ -25,7 +27,6 @@ class _LoginState extends State<Login> {
       passwordError = null;
     });
 
-    // Basic validation
     if (_emailController.text.trim().isEmpty) {
       setState(() => emailError = "Please enter your email");
       haserror = true;
@@ -49,6 +50,7 @@ class _LoginState extends State<Login> {
         context,
         MaterialPageRoute(builder: (context) => const Nav()),
       );
+      docemail = _emailController.text.trim();
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case 'email-already-in-use':
@@ -59,11 +61,8 @@ class _LoginState extends State<Login> {
           setState(() => emailError = "Invalid email address");
           break;
 
-        case 'weak-password':
-          setState(() => passwordError = "Password is too weak");
-          break;
-        case 'invalid-password':
-          setState(() => passwordError = "");
+        case 'invalid-credential':
+          setState(() => passwordError = "Password is incorrect");
           break;
 
         case 'operation-not-allowed':
@@ -163,8 +162,16 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 12),
 
                 TextField(
+                  onChanged: (_) {
+                    if (passwordError != null) {
+                      setState(() {
+                        passwordError = null;
+                      });
+                    }
+                  },
+
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: ispasswordvisible,
                   decoration: InputDecoration(
                     errorText: passwordError,
                     contentPadding: const EdgeInsets.fromLTRB(15, 10, 10, 10),
@@ -175,6 +182,26 @@ class _LoginState extends State<Login> {
                     hintText: 'Enter your Password',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                    ),
+                    suffixIcon: GestureDetector(
+                      onTapDown: (_) {
+                        setState(() {
+                          ispasswordvisible = false;
+                        });
+                      },
+                      onTapUp: (_) {
+                        setState(() {
+                          ispasswordvisible = true;
+                        });
+                      },
+                      onTapCancel: () {
+                        setState(() {
+                          ispasswordvisible = true;
+                        });
+                      },
+                      child: ispasswordvisible
+                          ? Icon(Icons.visibility_off)
+                          : Icon(Icons.visibility),
                     ),
                   ),
                 ),

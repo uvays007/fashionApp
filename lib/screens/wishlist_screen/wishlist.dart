@@ -13,6 +13,7 @@ class _WishlistPageState extends State<WishlistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         title: const Text(
           'Wishlist',
@@ -24,12 +25,12 @@ class _WishlistPageState extends State<WishlistPage> {
         ),
         centerTitle: true,
         backgroundColor: const Color(0xFFC19375),
-        elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context, true),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
+
       body: wishlistItems.isEmpty
           ? const Center(
               child: Text(
@@ -45,17 +46,19 @@ class _WishlistPageState extends State<WishlistPage> {
               padding: const EdgeInsets.all(20),
               itemCount: wishlistItems.length,
               itemBuilder: (context, index) {
-                final wishlistItem = wishlistItems[index];
+                final item = wishlistItems[index];
+                final originalIndex = item['index'];
 
-                final originalIndex = wishlistItem['index'];
-
-                return _buildWishlistItem(wishlistItem, originalIndex);
+                return _buildWishlistItem(item, originalIndex);
               },
             ),
     );
   }
 
   Widget _buildWishlistItem(Map<String, dynamic> product, int originalIndex) {
+    final img = product['image'];
+    final bool isNetwork = img.toString().startsWith("http");
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
@@ -65,13 +68,16 @@ class _WishlistPageState extends State<WishlistPage> {
       ),
       child: Row(
         children: [
+          // PRODUCT IMAGE
           Container(
             height: 80,
             width: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: AssetImage(product['image']),
+                image: isNetwork
+                    ? NetworkImage(img)
+                    : AssetImage(img) as ImageProvider,
                 fit: BoxFit.cover,
               ),
             ),
@@ -79,6 +85,7 @@ class _WishlistPageState extends State<WishlistPage> {
 
           const SizedBox(width: 12),
 
+          // TEXT + BUTTONS
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,82 +93,62 @@ class _WishlistPageState extends State<WishlistPage> {
                 Text(
                   product['name'],
                   style: const TextStyle(
-                    fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
                 ),
+
                 const SizedBox(height: 4),
+
                 Text(
                   product['price'],
                   style: const TextStyle(
-                    fontFamily: 'Inter',
                     fontWeight: FontWeight.w500,
                     color: Color(0xFFC19375),
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(height: 8),
+
+                const SizedBox(height: 10),
+
                 Row(
                   children: [
-                    SizedBox(
-                      height: 36,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          carts.add(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("${product['name']} added to cart"),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC19375),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    // ADD TO CART
+                    ElevatedButton(
+                      onPressed: () {
+                        carts.add(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("${product['name']} added to cart"),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        child: const Text(
-                          "Add to Cart",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC19375),
+                      ),
+                      child: const Text(
+                        "Add to Cart",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    SizedBox(width: 35),
-                    SizedBox(
-                      height: 36,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            wishlistItems.removeWhere(
-                              (item) => item['index'] == originalIndex,
-                            );
-                            isLiked[originalIndex] = false;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC19375),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        child: const Text(
-                          "Remove",
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
+
+                    const SizedBox(width: 25),
+
+                    // REMOVE FROM WISHLIST
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          wishlistItems.removeWhere(
+                            (item) => item['index'] == originalIndex,
+                          );
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFC19375),
+                      ),
+                      child: const Text(
+                        "Remove",
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
