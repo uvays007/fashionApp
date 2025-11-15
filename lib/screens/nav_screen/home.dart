@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comercial_app/screens/AllProducts_screen/allproducts.dart';
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/product_screen/product.dart';
@@ -39,10 +40,12 @@ final List<Map<String, dynamic>> banners = [
 int activeIndex = 0;
 final CarouselSliderController controller = CarouselSliderController();
 final searchController = TextEditingController();
-List<Map<String, String>> filteredproducts = [];
+List<Map<String, dynamic>> filteredproducts = [];
+List<Map<String, dynamic>> products = [];
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final VoidCallback? goToCart;
+  const Home({super.key, required this.goToCart});
 
   @override
   State<Home> createState() => _HomeState();
@@ -52,7 +55,25 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    loadProducts();
     filteredproducts = List.from(products);
+  }
+
+  Future<void> loadProducts() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection("products")
+          .get();
+
+      final products = snapshot.docs.map((doc) => doc.data()).toList();
+      offlineproducts.addAll(products);
+
+      setState(() {
+        filteredproducts = List.from(products);
+      });
+    } catch (e) {
+      debugPrint("Error loading products: $e");
+    }
   }
 
   void search() {
@@ -60,15 +81,15 @@ class _HomeState extends State<Home> {
 
     if (query.isEmpty) {
       setState(() {
-        filteredproducts = List.from(products);
+        filteredproducts = List.from(filteredproducts);
       });
       return;
     }
 
-    final matches = products
+    final matches = offlineproducts
         .where((item) => item['brandname']!.toLowerCase().contains(query))
         .toList();
-    final nonmatches = products
+    final nonmatches = offlineproducts
         .where((item) => !item['brandname']!.toLowerCase().contains(query))
         .toList();
 
@@ -313,7 +334,10 @@ class _HomeState extends State<Home> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Allproducts()),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Allproducts(goToCart: widget.goToCart),
+                        ),
                       );
                     },
                     child: Text(
@@ -344,6 +368,7 @@ class _HomeState extends State<Home> {
                 ),
                 itemBuilder: (context, index) {
                   final product = filteredproducts[index];
+
                   return Stack(
                     children: [
                       Container(
@@ -359,8 +384,10 @@ class _HomeState extends State<Home> {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        Product(product: product),
+                                    builder: (context) => Product(
+                                      product: product,
+                                      onGoToCart: widget.goToCart,
+                                    ),
                                   ),
                                 ),
                                 child: Container(
@@ -369,8 +396,9 @@ class _HomeState extends State<Home> {
                                     color: Colors.grey.shade300,
                                     borderRadius: BorderRadius.circular(15),
                                   ),
-                                  child: Image.asset(
-                                    product['image']!,
+                                  child: Image.network(
+                                    product['image'] ??
+                                        'https://via.placeholder.com/150',
                                     height: 180.h,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
@@ -380,7 +408,7 @@ class _HomeState extends State<Home> {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              product['brandname']!,
+                              product['brandname'] ?? 'brand',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
@@ -388,7 +416,7 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             Text(
-                              product['name']!,
+                              product['name'] ?? 'name',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
@@ -396,7 +424,7 @@ class _HomeState extends State<Home> {
                               ),
                             ),
                             Text(
-                              product['price']!,
+                              product['price'] ?? 'price',
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w500,
@@ -442,7 +470,7 @@ class _HomeState extends State<Home> {
                                         onPressed: () {
                                           wishlistItems.add({
                                             ...product,
-                                            "index": index,
+                                            'index': index,
                                           });
                                           Navigator.pop(context, true);
                                         },
@@ -469,6 +497,8 @@ class _HomeState extends State<Home> {
                               if (confirm == true) {
                                 setState(() {
                                   isLiked[index] = true;
+                                  print(isLiked[index]);
+                                  print(isLiked);
                                 });
                               }
                             } else {

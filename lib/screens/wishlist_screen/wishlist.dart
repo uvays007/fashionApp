@@ -71,7 +71,7 @@ class _WishlistPageState extends State<WishlistPage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               image: DecorationImage(
-                image: AssetImage(product['image']),
+                image: NetworkImage(product['image']),
                 fit: BoxFit.cover,
               ),
             ),
@@ -143,6 +143,8 @@ class _WishlistPageState extends State<WishlistPage> {
                             wishlistItems.removeWhere(
                               (item) => item['index'] == originalIndex,
                             );
+                            print(isLiked);
+
                             isLiked[originalIndex] = false;
                           });
                         },

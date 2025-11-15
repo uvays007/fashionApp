@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Allproducts extends StatelessWidget {
-  const Allproducts({super.key});
+  final VoidCallback? goToCart;
+  const Allproducts({super.key, required this.goToCart});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class Allproducts extends StatelessWidget {
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: products.length,
+                itemCount: offlineproducts.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 10.w,
@@ -36,7 +37,7 @@ class Allproducts extends StatelessWidget {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product = offlineproducts[index];
                   return Stack(
                     children: [
                       Container(
@@ -52,8 +53,10 @@ class Allproducts extends StatelessWidget {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        Product(product: product),
+                                    builder: (context) => Product(
+                                      product: product,
+                                      onGoToCart: goToCart,
+                                    ),
                                   ),
                                 ),
                                 child: Container(

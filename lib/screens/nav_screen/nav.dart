@@ -22,14 +22,15 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  final List<Widget> pages = [Home(), Tryon(), Cart(), Profile()];
-
   final List<String> icons = [
     'assets/icons/bottm_nav/home_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
     'assets/icons/bottm_nav/checkroom_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
     'assets/icons/bottm_nav/shopping_cart_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
     'assets/icons/bottm_nav/person_30dp_000000_FILL0_wght400_GRAD0_opsz24.svg',
   ];
+  void goToCart() {
+    setState(() => selectedIndex = 2);
+  }
 
   @override
   void initState() {
@@ -57,6 +58,12 @@ class _NavState extends State<Nav> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      Home(goToCart: goToCart),
+      Tryon(),
+      Cart(),
+      Profile(),
+    ];
     return Scaffold(
       drawer: buildDrawer(context),
       appBar: AppBar(
