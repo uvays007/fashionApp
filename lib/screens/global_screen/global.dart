@@ -1,12 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Stream<QuerySnapshot> getProductsStream() {
-  return FirebaseFirestore.instance.collection('products').snapshots();
+import 'package:flutter/material.dart';
+
+/// ******************************
+/// GLOBAL PRODUCT LIST (FROM FIREBASE / SUPABASE)
+/// ******************************
+
+List<Map<String, dynamic>> products = []; // Filled from Supabase Fetch
+
+/// ******************************
+/// WISHLIST + CART GLOBALS
+/// ******************************
+
+List<Map<String, dynamic>> wishlistItems = [];
+List<Map<String, dynamic>> carts = [];
+
+/// ******************************
+/// LIKED STATE (DYNAMICALLY UPDATED)
+/// ******************************
+
+List<bool> isLiked = [];
+
+/// ******************************
+/// SAFE VALUE HELPER
+/// ******************************
+
+String safe(dynamic value) {
+  if (value == null) return "";
+  return value.toString();
 }
 
-final List<Map<String, dynamic>> wishlistItems = [];
-
-final List<Map<String, dynamic>> carts = [];
 final List<Map<String, dynamic>> orders = [];
 final List<Map<String, dynamic>> notifications = [
   {

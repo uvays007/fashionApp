@@ -15,39 +15,18 @@ class _WishlistPageState extends State<WishlistPage> {
       backgroundColor: Colors.white,
 
       appBar: AppBar(
-        title: const Text(
-          'Wishlist',
-          style: TextStyle(
-            fontFamily: 'Inter',
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: true,
+        title: const Text("Wishlist"),
         backgroundColor: const Color(0xFFC19375),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
       ),
 
       body: wishlistItems.isEmpty
-          ? const Center(
-              child: Text(
-                "Your wishlist is empty",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-            )
+          ? const Center(child: Text("Your wishlist is empty"))
           : ListView.builder(
               padding: const EdgeInsets.all(20),
               itemCount: wishlistItems.length,
               itemBuilder: (context, index) {
                 final item = wishlistItems[index];
-                final originalIndex = item['index'];
+                final originalIndex = item["index"] ?? -1;
 
                 return _buildWishlistItem(item, originalIndex);
               },
@@ -55,31 +34,25 @@ class _WishlistPageState extends State<WishlistPage> {
     );
   }
 
-  Widget _buildWishlistItem(Map<String, dynamic> product, int originalIndex) {
-    final img = product['image'];
-    final bool isNetwork = img.toString().startsWith("http");
-
+  Widget _buildWishlistItem(Map<String, dynamic> p, int originalIndex) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFFF6F6F6),
         borderRadius: BorderRadius.circular(14),
       ),
+
       child: Row(
         children: [
-          // PRODUCT IMAGE
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: DecorationImage(
-                image: isNetwork
-                    ? NetworkImage(img)
-                    : AssetImage(img) as ImageProvider,
-                fit: BoxFit.cover,
-              ),
+          // IMAGE
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              safe(p['image']),
+              height: 80,
+              width: 80,
+              fit: BoxFit.cover,
             ),
           ),
 
@@ -91,21 +64,17 @@ class _WishlistPageState extends State<WishlistPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  product['name'],
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                  ),
+                  safe(p['name']),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
 
                 Text(
-                  product['price'],
+                  safe(p['price']),
                   style: const TextStyle(
-                    fontWeight: FontWeight.w500,
                     color: Color(0xFFC19375),
-                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
 
@@ -113,14 +82,12 @@ class _WishlistPageState extends State<WishlistPage> {
 
                 Row(
                   children: [
-                    // ADD TO CART
                     ElevatedButton(
                       onPressed: () {
-                        carts.add(product);
+                        carts.add(p);
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("${product['name']} added to cart"),
-                          ),
+                          SnackBar(content: Text("${p['name']} added to cart")),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -132,15 +99,19 @@ class _WishlistPageState extends State<WishlistPage> {
                       ),
                     ),
 
-                    const SizedBox(width: 25),
+                    const SizedBox(width: 20),
 
-                    // REMOVE FROM WISHLIST
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
                           wishlistItems.removeWhere(
-                            (item) => item['index'] == originalIndex,
+                            (item) => (item['index'] ?? -1) == originalIndex,
                           );
+
+                          if (originalIndex >= 0 &&
+                              originalIndex < isLiked.length) {
+                            isLiked[originalIndex] = false;
+                          }
                         });
                       },
                       style: ElevatedButton.styleFrom(

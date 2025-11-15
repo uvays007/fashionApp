@@ -130,8 +130,6 @@ class _HomeState extends State<Home> {
                       ),
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
-                        print(product);
-                        print("IMAGE => ${product['image']}");
 
                         return Stack(
                           children: [
@@ -166,35 +164,11 @@ class _HomeState extends State<Home> {
                                           borderRadius: BorderRadius.circular(
                                             15,
                                           ),
-                                          child: Image.network(
-                                            product['image']?.toString() ??
-                                                "", // <-- SAFE
+                                          child: Image.asset(
+                                            'assets/images/alex-haigh-fEt6Wd4t4j0-unsplash.png',
                                             height: 180.h,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
-                                            loadingBuilder:
-                                                (
-                                                  context,
-                                                  child,
-                                                  loadingProgress,
-                                                ) {
-                                                  if (loadingProgress == null)
-                                                    return child;
-                                                  return Center(
-                                                    child:
-                                                        CircularProgressIndicator(),
-                                                  );
-                                                },
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return Center(
-                                                    child: Icon(
-                                                      Icons.broken_image,
-                                                      size: 40,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  );
-                                                },
                                           ),
                                         ),
                                       ),
@@ -202,21 +176,21 @@ class _HomeState extends State<Home> {
                                   ),
                                   SizedBox(height: 4.h),
                                   Text(
-                                    product['brandname'],
+                                    product['brandname'] ?? "No Brand",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14.sp,
                                     ),
                                   ),
                                   Text(
-                                    product['name'],
+                                    product['name'] ?? "No name",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 13.sp,
                                     ),
                                   ),
                                   Text(
-                                    product['price'],
+                                    product['price'] ?? "0",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color: Colors.grey[700],
