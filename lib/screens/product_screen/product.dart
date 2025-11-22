@@ -1,4 +1,5 @@
-import 'package:comercial_app/screens/global_screen/global.dart';
+import 'package:comercial_app/screens/order_screen/orderpayment.dart';
+import 'package:comercial_app/services/cart_service.dart';
 import 'package:comercial_app/theme/Textstyles.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,8 @@ class _ProductState extends State<Product> {
   Color selectedColor = Colors.black;
   int quantity = 1;
   bool iscart = false;
+  final carts = CartlistService();
+  String? totalPrice;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +120,6 @@ class _ProductState extends State<Product> {
                           ),
                           child: Row(
                             children: [
-                              // ➖ Minus Button
                               InkWell(
                                 onTap: () {
                                   if (quantity > 1) setState(() => quantity--);
@@ -142,20 +144,16 @@ class _ProductState extends State<Product> {
 
                               const SizedBox(width: 14),
 
-                              // Quantity Text
                               Text(
                                 quantity.toString(),
                                 style: AppTextStyles.bold.copyWith(
                                   fontSize: 18,
-                                  color: const Color(
-                                    0xFFC19375,
-                                  ), // accent color
+                                  color: const Color(0xFFC19375),
                                 ),
                               ),
 
                               const SizedBox(width: 14),
 
-                              // ➕ Add Button
                               InkWell(
                                 onTap: () {
                                   setState(() => quantity++);
@@ -332,7 +330,7 @@ class _ProductState extends State<Product> {
 
                 setState(() {
                   if (!iscart) {
-                    carts.add({
+                    carts.addToCart({
                       'name': widget.product['name'],
                       'price': widget.product['price'],
                       'image': widget.product['image'],
@@ -380,6 +378,7 @@ class _ProductState extends State<Product> {
                 ),
               ),
               onPressed: () {
+                final totalPrice = widget.product['price'];
                 if (selectedSize == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -389,15 +388,12 @@ class _ProductState extends State<Product> {
                   );
                   return;
                 }
-                carts.add({
-                  'name': widget.product['name'],
-                  'price': widget.product['price'],
-                  'image': widget.product['image'],
-                  'brandname': widget.product['brandname'],
-                  'qty': quantity,
-                  'size': selectedSize,
-                  'color': selectedColor.toARGB32(),
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OrderPaymentPage(total: totalPrice),
+                  ),
+                );
               },
               child: const Text(
                 'Buy Now',

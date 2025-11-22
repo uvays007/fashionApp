@@ -38,7 +38,6 @@ class _TryonState extends State<Tryon> {
     {"name": "Hasp Men Jeans Grey", "image": "assets/images/pant_blueflop.png"},
   ];
 
-  // Filtered lists (start with all items)
   List<Map<String, String>> filteredShirts = [];
   List<Map<String, String>> filteredPants = [];
 

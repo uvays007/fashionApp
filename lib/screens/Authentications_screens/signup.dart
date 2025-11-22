@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comercial_app/helper/passwordvalidation.dart';
 import 'package:comercial_app/screens/Authentications_screens/login.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ class _SignupState extends State<Signup> {
   String? usernameerror;
   String? emailerror;
   String? passworderror;
+  FirebaseFirestore database = FirebaseFirestore.instance;
 
   bool haserror = false;
 
@@ -64,6 +67,11 @@ class _SignupState extends State<Signup> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      final name = await database.collection('Users').add({
+        'name': _usernameController.text.trim(),
+        'email': _emailController.text.trim(),
+      });
+      nameid = name.id;
 
       if (!mounted) return;
       Navigator.pushReplacement(

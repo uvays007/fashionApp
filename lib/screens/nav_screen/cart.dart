@@ -1,7 +1,7 @@
 import 'package:comercial_app/screens/order_screen/orderpayment.dart';
+import 'package:comercial_app/services/cart_service.dart';
 import 'package:flutter/material.dart';
 import 'package:comercial_app/theme/Textstyles.dart';
-import 'package:comercial_app/screens/global_screen/global.dart';
 
 class Cart extends StatefulWidget {
   const Cart({super.key});
@@ -11,17 +11,10 @@ class Cart extends StatefulWidget {
 }
 
 class _CartState extends State<Cart> {
-  double totalPrice = 0.0;
+  final cartslist = CartlistService();
 
-  @override
-  void initState() {
-    super.initState();
-    _calculateTotal();
-  }
-
-  // -------------------- TOTAL CALCULATION -----------------------
-  void _calculateTotal() {
-    double sum = 0.0;
+  double calculateTotal(List<Map<String, dynamic>> carts) {
+    double sum = 0;
 
     for (var cart in carts) {
       final priceString = cart['price'].toString().replaceAll(
@@ -34,8 +27,7 @@ class _CartState extends State<Cart> {
 
       sum += price * qty;
     }
-
-    setState(() => totalPrice = sum);
+    return sum;
   }
 
   @override
@@ -43,279 +35,274 @@ class _CartState extends State<Cart> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F6F3),
 
-      // ---------------- Bottom Button ----------------
-      bottomNavigationBar: carts.isEmpty
-          ? null
-          : Container(
-              padding: const EdgeInsets.all(18),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 8,
-                    offset: Offset(0, -3),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Center(
-                    child: Text(
-                      "Rs.${totalPrice.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
+      body: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: cartslist.getCartlist(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFC19375),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      onPressed: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OrderPaymentPage(
-                              total: totalPrice.toStringAsFixed(2),
-                            ),
-                          ),
-                        );
+          final carts = snapshot.data!;
+          final totalPrice = calculateTotal(carts);
 
-                        if (result == true) {
-                          setState(() => carts.clear());
-                        }
-                      },
-                      child: const Text(
-                        "Place Order",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-      // ---------------- Main Body ----------------
-      body: carts.isEmpty
-          ? const Center(
+          if (carts.isEmpty) {
+            return const Center(
               child: Text(
                 "Your Cart is Empty",
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-            )
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
+            );
+          }
 
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: carts.length,
-                        separatorBuilder: (context, index) =>
-                            SizedBox(height: 5),
-                        itemBuilder: (context, index) {
-                          final cart = carts[index];
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ListView.separated(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: carts.length,
+                      separatorBuilder: (_, __) => SizedBox(height: 5),
+                      itemBuilder: (context, index) {
+                        final cart = carts[index];
 
-                          // Extract base price number
-                          final priceString = cart['price']
-                              .toString()
-                              .replaceAll(RegExp(r'[^0-9.]'), '');
+                        final priceString = cart['price'].toString().replaceAll(
+                          RegExp(r'[^0-9.]'),
+                          '',
+                        );
 
-                          double basePrice = double.tryParse(priceString) ?? 0;
-                          int qty = cart['qty'] ?? 1;
+                        double basePrice = double.tryParse(priceString) ?? 0;
+                        int qty = cart['qty'] ?? 1;
 
-                          double itemTotal = basePrice * qty;
+                        double itemTotal = basePrice * qty;
 
-                          return Container(
-                            height: 125,
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    cart['image'],
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                  ),
+                        return Container(
+                          height: 125,
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  cart['image'],
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
                                 ),
+                              ),
 
-                                const SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      cart['brandname'],
-                                      style: AppTextStyles.bold.copyWith(
-                                        fontSize: 15,
-                                      ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cart['brandname'],
+                                    style: AppTextStyles.bold.copyWith(
+                                      fontSize: 15,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      cart['name'],
-                                      style: AppTextStyles.medium.copyWith(
-                                        color: Colors.grey[700],
-                                      ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    cart['name'],
+                                    style: AppTextStyles.medium.copyWith(
+                                      color: Colors.grey[700],
                                     ),
+                                  ),
 
-                                    const SizedBox(height: 6),
+                                  const SizedBox(height: 6),
 
-                                    // --------- QTY DROPDOWN ----------
-                                    SizedBox(
-                                      width: 70,
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<int>(
-                                          value: qty,
-                                          isExpanded: true,
-                                          icon: Icon(Icons.arrow_drop_down),
-                                          items: List.generate(
-                                            10,
-                                            (i) => DropdownMenuItem(
-                                              value: i + 1,
-                                              child: Text(
-                                                '${i + 1}',
-                                                style: TextStyle(fontSize: 14),
-                                              ),
+                                  SizedBox(
+                                    width: 70,
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<int>(
+                                        value: qty,
+                                        isExpanded: true,
+                                        items: List.generate(
+                                          10,
+                                          (i) => DropdownMenuItem(
+                                            value: i + 1,
+                                            child: Text(
+                                              '${i + 1}',
+                                              style: TextStyle(fontSize: 14),
                                             ),
                                           ),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              cart['qty'] = value!;
-                                              _calculateTotal();
-                                            });
-                                          },
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Spacer(),
-
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Rs.${itemTotal.toStringAsFixed(2)}",
-                                      style: AppTextStyles.bold.copyWith(
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    // ---------- DELETE BUTTON ----------
-                                    SizedBox(
-                                      height: 40,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            carts.removeAt(index);
-                                            _calculateTotal();
+                                        onChanged: (value) {
+                                          cartslist.addToCart({
+                                            ...cart,
+                                            "qty": value!,
                                           });
                                         },
-                                        child: Container(
-                                          padding: EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey.shade200,
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Remove',
-                                                style: AppTextStyles.bold,
-                                              ),
-                                              Icon(
-                                                Icons.delete,
-                                                color: Colors.red,
-                                                size: 22,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
                                       ),
                                     ),
+                                  ),
+                                ],
+                              ),
 
-                                    // ---------- PRICE × QTY ----------
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                              Spacer(),
+
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Rs.${itemTotal.toStringAsFixed(2)}",
+                                    style: AppTextStyles.bold.copyWith(
+                                      fontSize: 16,
+                                    ),
+                                  ),
+
+                                  GestureDetector(
+                                    onTap: () =>
+                                        cartslist.removeFromCart(cart['id']),
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'Remove',
+                                            style: AppTextStyles.bold,
+                                          ),
+                                          Icon(
+                                            Icons.delete,
+                                            color: Colors.red,
+                                            size: 22,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
-
-                      const SizedBox(height: 20),
-
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            _totalRow(
-                              "Subtotal",
-                              "Rs.${totalPrice.toStringAsFixed(2)}",
-                            ),
-                            const SizedBox(height: 6),
-                            _totalRow(
-                              "Shipping",
-                              "Free",
-                              valueColor: Colors.green,
-                            ),
-                            const Divider(height: 25, thickness: 1),
-                            _totalRow(
-                              "Total",
-                              "Rs.${totalPrice.toStringAsFixed(2)}",
-                              isBold: true,
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          _totalRow(
+                            "Subtotal",
+                            "Rs.${totalPrice.toStringAsFixed(2)}",
+                          ),
+                          const SizedBox(height: 6),
+                          _totalRow(
+                            "Shipping",
+                            "Free",
+                            valueColor: Colors.green,
+                          ),
+                          const Divider(height: 25, thickness: 1),
+                          _totalRow(
+                            "Total",
+                            "Rs.${totalPrice.toStringAsFixed(2)}",
+                            isBold: true,
+                          ),
+                        ],
                       ),
+                    ),
 
-                      const SizedBox(height: 90),
-                    ],
-                  ),
+                    const SizedBox(height: 100),
+                  ],
                 ),
               ),
             ),
+          );
+        },
+      ),
+
+      bottomNavigationBar: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: cartslist.getCartlist(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) return SizedBox();
+
+          final totalPrice = calculateTotal(snapshot.data!);
+
+          return Container(
+            padding: const EdgeInsets.all(18),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, -3),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Rs.${totalPrice.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC19375),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OrderPaymentPage(
+                            total: totalPrice.toStringAsFixed(2),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Place Order",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 

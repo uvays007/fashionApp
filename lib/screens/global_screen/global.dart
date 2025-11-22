@@ -1,11 +1,7 @@
 final List<Map<String, dynamic>> offlineproducts = [];
 
-final List<Map<String, dynamic>> wishlistItems = [];
-
 List<bool> isLiked = List.generate(offlineproducts.length, (index) => false);
 
-final List<Map<String, dynamic>> carts = [];
-final List<Map<String, dynamic>> orders = [];
 final List<Map<String, dynamic>> notifications = [
   {
     "message": "Get 25% off on all men’s clothing this weekend only!",
@@ -16,3 +12,4 @@ final List<Map<String, dynamic>> notifications = [
     "time": "1 day ago",
   },
 ];
+String? nameid;

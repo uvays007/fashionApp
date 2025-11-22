@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comercial_app/screens/AllProducts_screen/allproducts.dart';
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/product_screen/product.dart';
+import 'package:comercial_app/services/wishlist_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -42,6 +43,7 @@ final CarouselSliderController controller = CarouselSliderController();
 final searchController = TextEditingController();
 List<Map<String, dynamic>> filteredproducts = [];
 List<Map<String, dynamic>> products = [];
+final wishlists = WishlistService();
 
 class Home extends StatefulWidget {
   final VoidCallback? goToCart;
@@ -468,10 +470,6 @@ class _HomeState extends State<Home> {
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                          wishlistItems.add({
-                                            ...product,
-                                            'index': index,
-                                          });
                                           Navigator.pop(context, true);
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -496,18 +494,21 @@ class _HomeState extends State<Home> {
 
                               if (confirm == true) {
                                 setState(() {
+                                  wishlists.addToWishlist(product, index);
                                   isLiked[index] = true;
-                                  print(isLiked[index]);
-                                  print(isLiked);
                                 });
                               }
                             } else {
-                              setState(() {
-                                isLiked[index] = false;
-                                wishlistItems.removeWhere(
-                                  (item) => item["index"] == index,
-                                );
-                              });
+                              try {
+                                setState(() {
+                                  wishlists.removeByIndex(index);
+                                  setState(() {
+                                    isLiked[index] = false;
+                                  });
+                                });
+                              } catch (e) {
+                                debugPrint('Error:$e');
+                              }
                             }
                           },
 

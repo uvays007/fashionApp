@@ -1,25 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class WishlistService {
+class CartlistService {
   final _firestore = FirebaseFirestore.instance;
 
-  Future<void> addToWishlist(Map<String, dynamic> product, int index) async {
+  Future<void> addToCart(Map<String, dynamic> product) async {
     String productId = product["id"] ?? UniqueKey().toString();
 
-    await _firestore.collection("wishlist").doc(productId).set({
+    await _firestore.collection("cart").doc(productId).set({
       ...product,
       "id": productId,
-      "index": index,
     });
   }
 
-  Future<void> removeFromWishlist(String productId) async {
-    await _firestore.collection("wishlist").doc(productId).delete();
+  Future<void> removeFromCart(String productId) async {
+    await _firestore.collection("cart").doc(productId).delete();
   }
 
-  Stream<List<Map<String, dynamic>>> getWishlist() {
-    return _firestore.collection("wishlist").snapshots().map((snapshot) {
+  Stream<List<Map<String, dynamic>>> getCartlist() {
+    return _firestore.collection("cart").snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data();
         data["id"] = doc.id;
@@ -30,7 +29,7 @@ class WishlistService {
 
   Future<void> removeByIndex(int index) async {
     final QuerySnapshot snapshot = await _firestore
-        .collection("wishlist")
+        .collection("cart")
         .where("index", isEqualTo: index)
         .get();
 

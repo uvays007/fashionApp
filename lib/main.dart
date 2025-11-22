@@ -1,5 +1,5 @@
+import 'package:comercial_app/screens/Authentications_screens/login.dart';
 import 'package:comercial_app/screens/Authentications_screens/signup.dart';
-import 'package:comercial_app/screens/nav_screen/home.dart';
 import 'package:comercial_app/screens/nav_screen/nav.dart';
 import 'package:comercial_app/screens/onboarding_screen/onboarding.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,6 +26,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: Nav());
+    return MaterialApp(debugShowCheckedModeBanner: false, home: Login());
   }
 }

@@ -1,3 +1,5 @@
+import 'package:comercial_app/services/cart_service.dart';
+import 'package:comercial_app/services/wishlist_service.dart';
 import 'package:flutter/material.dart';
 import 'package:comercial_app/screens/global_screen/global.dart';
 
@@ -7,6 +9,9 @@ class WishlistPage extends StatefulWidget {
   @override
   State<WishlistPage> createState() => _WishlistPageState();
 }
+
+final wishlist = WishlistService();
+final carts = CartlistService();
 
 class _WishlistPageState extends State<WishlistPage> {
   @override
@@ -30,28 +35,29 @@ class _WishlistPageState extends State<WishlistPage> {
           onPressed: () => Navigator.pop(context, true),
         ),
       ),
-      body: wishlistItems.isEmpty
-          ? const Center(
-              child: Text(
-                "Your wishlist is empty",
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(20),
-              itemCount: wishlistItems.length,
-              itemBuilder: (context, index) {
-                final wishlistItem = wishlistItems[index];
+      body: StreamBuilder<List<Map<String, dynamic>>>(
+        stream: wishlist.getWishlist(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+          final wishlistItems = snapshot.data!;
+          if (wishlistItems.isEmpty) {
+            return Center(child: Text("Wishlist is empty"));
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: wishlistItems.length,
+            itemBuilder: (context, index) {
+              final wishlistItem = wishlistItems[index];
 
-                final originalIndex = wishlistItem['index'];
+              final originalIndex = wishlistItem['index'];
 
-                return _buildWishlistItem(wishlistItem, originalIndex);
-              },
-            ),
+              return _buildWishlistItem(wishlistItem, originalIndex);
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -108,7 +114,6 @@ class _WishlistPageState extends State<WishlistPage> {
                       height: 36,
                       child: ElevatedButton(
                         onPressed: () {
-                          carts.add(product);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("${product['name']} added to cart"),
@@ -140,10 +145,7 @@ class _WishlistPageState extends State<WishlistPage> {
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            wishlistItems.removeWhere(
-                              (item) => item['index'] == originalIndex,
-                            );
-                            print(isLiked);
+                            wishlist.removeFromWishlist(product["id"]);
 
                             isLiked[originalIndex] = false;
                           });

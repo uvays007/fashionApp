@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:comercial_app/helper/timehelper.dart';
 import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,8 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
   double discount = 0;
   bool couponApplied = false;
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     double originalTotal = double.tryParse(widget.total) ?? 0;
@@ -39,7 +42,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
           children: [
             const SizedBox(height: 10),
 
-            // ---------------- ORDER SUMMARY ----------------
             const Text(
               "Order Summary",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -62,7 +64,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
 
             const SizedBox(height: 30),
 
-            // ---------------- ADDRESS SECTION ----------------
             const Text(
               "Delivery Address",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -82,7 +83,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
 
             const SizedBox(height: 30),
 
-            // ---------------- COUPON SECTION ----------------
             const Text(
               "Apply Coupon",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -122,7 +122,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
 
             const SizedBox(height: 30),
 
-            // ---------------- PAYMENT METHOD ----------------
             const Text(
               "Select Payment Method",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -175,7 +174,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     );
   }
 
-  // ---------------------- UI HELPERS ----------------------
   Widget _buildSummaryRow(
     String label,
     String value, {
@@ -291,7 +289,6 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     );
   }
 
-  // ---------------------- APPLY COUPON ----------------------
   void _applyCoupon() {
     String code = _couponController.text.trim().toUpperCase();
 
@@ -329,8 +326,41 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
     }
   }
 
-  // ---------------------- PAYMENT SUCCESS ----------------------
-  void _showPaymentSuccess(BuildContext context, double finalTotal) {
+  void _showPaymentSuccess(BuildContext context, double finalTotal) async {
+    final cartSnapshot = await _firestore.collection("cart").get();
+    List<Map<String, dynamic>> cartItems = cartSnapshot.docs
+        .map((doc) => doc.data())
+        .toList();
+
+    if (cartItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Your cart is empty"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    await _firestore.collection("orders").add({
+      "items": cartItems,
+      "total": finalTotal,
+      "address": _addressController.text.trim(),
+      "payment_method": _selectedPayment,
+      "time": DateTime.now().toString(),
+    });
+
+    String productNames = cartItems.map((item) => item['name']).join(", ");
+
+    notifications.add({
+      "message": "Your order for $productNames has been placed successfully!",
+      "time": timeAgo(DateTime.now()),
+    });
+
+    for (var doc in cartSnapshot.docs) {
+      await doc.reference.delete();
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -353,24 +383,12 @@ class _OrderPaymentPageState extends State<OrderPaymentPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFC19375),
+                backgroundColor: Color(0xFFC19375),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
               onPressed: () {
-                orders.addAll(carts);
-
-                String productNames = carts
-                    .map((item) => item['name'])
-                    .join(", ");
-
-                notifications.add({
-                  "message":
-                      "Your order for $productNames has been placed successfully!",
-                  "time": timeAgo(DateTime.now()),
-                });
-
                 Navigator.pop(context);
                 Navigator.pop(context, true);
               },

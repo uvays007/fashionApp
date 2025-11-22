@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:comercial_app/screens/global_screen/global.dart';
 import 'package:comercial_app/screens/order_screen/order.dart';
 import 'package:comercial_app/screens/wishlist_screen/wishlist.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
+
+  Future<Map<String, dynamic>> getname() async {
+    final namedata = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(nameid)
+        .get();
+
+    return namedata.data() ?? {};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,24 +66,46 @@ class Profile extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              "Fazil Shaz",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                fontSize: 20,
-              ),
+            FutureBuilder<Map<String, dynamic>>(
+              future: getname(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Text(
+                    "loading",
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 20,
+                    ),
+                  );
+                }
+                final user = snapshot.data!;
+                final username = user['name'] ?? "no name";
+                final email = user['email'] ?? "no email";
+                return Column(
+                  children: [
+                    Text(
+                      username,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      email,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 4),
-            Text(
-              "fazil123@gmail.com",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                color: Colors.grey[700],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 10),
 
             _buildProfileOption(
               icon:

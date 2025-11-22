@@ -62,8 +62,11 @@ class _LoginState extends State<Login> {
         case 'weak-password':
           setState(() => passwordError = "Password is too weak");
           break;
-        case 'invalid-password':
-          setState(() => passwordError = "");
+        case 'user-not-found':
+          setState(() => emailError = "No account found for this email");
+          break;
+        case 'invalid-credential':
+          setState(() => passwordError = "Password is incorrect");
           break;
 
         case 'operation-not-allowed':
